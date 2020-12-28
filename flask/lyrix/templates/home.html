@@ -1,4 +1,37 @@
 {% extends "layout.html" %}
 {% block content %}
-	<h1>Home Page</h1>
+	<form method="POST" action="" class="row  g-3 align-items-center">
+		{{ form.hidden_tag() }}
+		
+		<div class="col-md-8">
+	 	<div class="form-group " >
+	 		<div class="form-floating ">
+	 			
+	 			{% if form.lyrics.errors %}
+		            {{ form.lyrics(class="form-control is-invalid", id="floatingInput") }}
+		            <div class="invalid-feedback">
+		                {% for error in form.lyrics.errors %}
+		                    <span>{{ error }}</span>
+		                {% endfor %}
+		            </div>
+		        {% else %}
+		            {{ form.lyrics(class="form-control", id="floatingInput", placeholder=" Lyrics", value="Happy New Year") }}
+		        {% endif %}
+	 			<label for="floatingInput">Search Lyrics</label>
+
+	 		</div>
+	 	</div>
+	 </div>
+	 	<div class="col-md-4">
+	 	<div class="form-group" >
+	 		{{ form.submit(class="btn btn-outline-info") }}	
+	 		
+	 	</div>
+	 	</div>
+	 		 
+	</form>
+
+
+
+
 {% endblock content %}
