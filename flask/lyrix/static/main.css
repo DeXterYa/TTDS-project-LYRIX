@@ -35,3 +35,13 @@ h1, h2, h3, h4, h5, h6 {
 label {
 	color: #adb5bd;
 }
+
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 5px;
+  margin-bottom: 16px;
+}
+.account-heading {
+  font-size: 1.5rem;
+}
