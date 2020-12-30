@@ -8,6 +8,7 @@ Structure of this project:
 │   ├── lyrix
 │   │   ├── forms.py
 │   │   ├── __init__.py
+│   │   ├── models.py
 │   │   ├── routes.py
 │   │   ├── static
 │   │   │   ├── main.css
@@ -23,8 +24,6 @@ Structure of this project:
 │   └── run.py
 ├── README.md
 └── requirements.txt
-
-
 ```
 
 In the `./flask/`, we adopted a package structure.
@@ -38,7 +37,10 @@ $ python run.py
 ```
 `./flask/lyrix/` contains all the other files. `./flask/lyrix/static/` contains a css file and profile pics for team members. `./flask/lyrix/templates/` contains all the html files.
 (`layout.html` is the shared layout for all other html files) `./flask/lyrix/forms.py` contains search fields (a form) in the home page. 
-`./flask/lyrix/routes.py` contains all the routes in the application.
+`./flask/lyrix/routes.py` contains all the routes in the application. `./flask/lyrix/models.py` contains fields for database.
+
+In this branch, I added Flask-MongoEngine to connect the application with a MongoDB database with 10 songs from Taylor Swift. 
+The application now keeps the search query on the web page after clicking the search button. MongoEngine also supports pagination.
 
 ## MongoDB
 There are two ways of hosting the database. The first one is to host the database on the [cloud](https://www.mongodb.com/), 

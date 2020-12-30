@@ -15,7 +15,12 @@
 			                {% endfor %}
 			            </div>
 			        {% else %}
-			            {{ form.lyrics(class="form-control", id="floatingInput", placeholder="Search Lyrics") }}
+			        	{% if lyrics %}
+			            	{{ form.lyrics(class="form-control", id="floatingInput", placeholder="Search Lyrics", value=lyrics) }}
+			            {% else %}
+			            	{{ form.lyrics(class="form-control", id="floatingInput", placeholder="Search Lyrics") }}
+			            {% endif %}
+			        	
 			        {% endif %}
 			        <!-- floating label -->
 	 				<label for="floatingInput">Search Lyrics...</label>
@@ -37,12 +42,25 @@
 		 		<div class="accordion-item">
 		 			<!-- header -->
 		 			<h2 class="accordion-header" id="headingOne">
-		 				<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-					    	Advanced Search
-					    </button>
+
+		 				{% if singer or startdate or enddate %}
+			 				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+						    	Advanced Search
+						    </button>
+					    {% else %}
+					    	<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+						    	Advanced Search
+						    </button>
+					    {% endif %}
+
+
 		 			</h2>
 		 			<!-- body -->
+		 			{% if singer or startdate or enddate %}
+		 			<div id="collapseOne" class="accordion-collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+		 			{% else %}
 		 			<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+		 			{% endif %}
 				    	<div class="accordion-body">
 				    		<div class="row g-3 align-items-center">
 				    			<div class="col-md-1">
@@ -57,8 +75,11 @@
 					    		<div class="col-md-6 mb-3 ">
 						        	<div class="form-group-sm">
 						        		<div class="form-floating">
-						  
-						        			{{ form.singer(class="form-control input-sm", id="singerInput", placeholder="singerInput") }}
+						  					{% if singer%}
+						        				{{ form.singer(class="form-control input-sm", id="singerInput", placeholder="singerInput", value=singer) }}
+						        			{% else %}
+						        				{{ form.singer(class="form-control input-sm", id="singerInput", placeholder="singerInput") }}
+						        			{% endif %}
 						        			<label for="singerInput">Singer</label>
 						        		</div>
 						        	</div>
@@ -75,7 +96,12 @@
 					        	<div class="col-md-3 ">
 						        	<div class="form-group">
 						        		<div class="form-floating">
-						        			{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear") }}
+						        			{% if startdate %}
+						        				{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear", value=startdate) }}
+						        			{% else %}
+						        				{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear") }}
+						        			{% endif %}
+						        			
 						        			<label for="fromYear">From year</label>
 						        		</div>
 						        	</div>
@@ -84,7 +110,12 @@
 					        	<div class="col-md-3">
 						        	<div class="form-group">
 						        		<div class="form-floating">
-						        			{{ form.year_end(class="form-control", id="toYear", placeholder="toYear") }}
+						        			{% if enddate %}
+						        				{{ form.year_end(class="form-control", id="toYear", placeholder="toYear", value=enddate) }}
+						        			{% else %}
+						        				{{ form.year_end(class="form-control", id="toYear", placeholder="toYear") }}
+						        			{% endif %}
+						        			
 						        			<label for="toYear">To year</label>
 						        		</div>
 						        	</div>
@@ -105,7 +136,7 @@
 	 		 
 	</form>
 
-
+	{% if lyrics or singer or startdate or enddate %}
 	{% for song in songs %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
@@ -117,6 +148,7 @@
           </div>
         </article>
     {% endfor %}
+    {% endif %}
 
 
 
