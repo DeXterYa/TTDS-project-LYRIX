@@ -4,15 +4,21 @@ from lyrix.forms import SearchBox
 from lyrix.models import Lyrics
 
 # different pages
-# @app.route('/<string:lyrics>/<string:singer>/<string:startdate>/<string:enddate>', methods=['GET', 'POST']) # the root page of the website
 @app.route('/', methods=['GET', 'POST'])
+@app.route("/home", methods=['GET', 'POST'])
 def home():
+	# acquire these queries after searching to keep them in the search box
 	lyrics = request.args.get('lyrics', None)
 	singer = request.args.get('singer', None)
 	startdate = request.args.get('startdate', None)
 	enddate = request.args.get('enddate', None)
 
-	songs = Lyrics.objects(artist="Taylor Swift")
+	# acquire current page of the search results
+	page = request.args.get('page', 1, type=int)
+
+
+
+	songs = Lyrics.objects(artist="Taylor Swift").paginate(page=page, per_page=2)
 	form = SearchBox()
 	# green flash message on top of the search box
 	if form.validate_on_submit():

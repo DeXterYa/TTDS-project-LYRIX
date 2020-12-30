@@ -137,7 +137,22 @@
 	</form>
 
 	{% if lyrics or singer or startdate or enddate %}
-	{% for song in songs %}
+
+	{% for page_num in songs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if page_num %}
+        {% if songs.page == page_num %}
+          <a class="btn btn-info mb-4" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page=page_num) }}">{{ page_num }}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+      {% else %}
+        ...
+      {% endif %}
+    {% endfor %}
+
+
+
+	{% for song in songs.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
           <div class="media-body">

@@ -39,8 +39,11 @@ $ python run.py
 (`layout.html` is the shared layout for all other html files) `./flask/lyrix/forms.py` contains search fields (a form) in the home page. 
 `./flask/lyrix/routes.py` contains all the routes in the application. `./flask/lyrix/models.py` contains fields for database.
 
-In this branch, I added Flask-MongoEngine to connect the application with a MongoDB database with 10 songs from Taylor Swift. 
-The application now keeps the search query on the web page after clicking the search button. MongoEngine also supports pagination.
+In this branch,
+* I used [Flask-MongoEngine](http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/) to connect the application 
+  with a MongoDB database with 10 songs (used as dummy data) from Taylor Swift. 
+* The application now keeps the search query on the web page after clicking the search button.
+* The application now supports pagination of the search results.
 
 ## MongoDB
 There are two ways of hosting the database. The first one is to host the database on the [cloud](https://www.mongodb.com/), 
