@@ -32,10 +32,14 @@ Example link to Genius lyrics:
 https://genius.com/Kanye-west-lift-yourself-lyrics
 ## How to run
 To run the crawler you **MUST** be in the crawler directory.
-`cd crawler`
+```
+$ cd crawler
+```
 Example uses:
-`python crawl.py --type link_crawl --start 0 --end 100 --num_processes 10`
-`python crawl.py --type song_crawl --links_file ./outputs/all_links_0.txt --num_processes 10`
+```
+$ python crawl.py --type link_crawl --start 0 --end 100 --num_processes 10
+$ python crawl.py --type song_crawl --links_file ./outputs/all_links_0.txt --num_processes 10
+```
 #### Inputs
 1. `--type` - song_crawl or link_crawl
 2. `--num_processes` - number of threads on which you want to run the crawler. Default = 1.
