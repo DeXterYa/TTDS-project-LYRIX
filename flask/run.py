@@ -7,4 +7,4 @@ from lyrix import app
 # package structure with __init__.py in lyrix folder
 # it is only true when running this script directly
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
