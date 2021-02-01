@@ -1,5 +1,6 @@
 import requests
 import math
+import os
 import multiprocessing as mp
 
 from bs4       import BeautifulSoup
@@ -41,6 +42,7 @@ def crawl_songs_links(start, interval, process_num):
 def gather_song_links(start, end, num_processes):
 
     # If temporary/links directory does not exist in current directory, create it.
+    Path('./temporary').mkdir(exist_ok=True)
     Path('./temporary/links').mkdir(exist_ok=True)
 
     # interval is number of pages with links to songs lyrics that each thread should crawl.

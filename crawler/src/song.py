@@ -1,5 +1,6 @@
 import requests
 import re
+import langdetect
 
 from bs4 import BeautifulSoup
 
@@ -28,12 +29,14 @@ class Song:
     # Initialize with link to Genius song page. This page will be scraped.
     def __init__(self, link):
 
-        self.url     = link
-        html         = requests.get(link).text
-        self.lyrics  = self.extract_lyrics(html)
-        self.credits = self.extract_credits(html, 'credits') | self.extract_credits(html, 'headers')
-        self.title   = self.extract_title(html)
-        self.author  = self.extract_author(html)
+        self.url      = link
+        request       = requests.get(link)
+        html          = request.text
+        self.lyrics   = self.extract_lyrics(html)
+        self.credits  = {**self.extract_credits(html, 'credits'), **self.extract_credits(html, 'headers')}
+        self.title    = self.extract_title(html)
+        self.author   = self.extract_author(html)
+        self.language = self.detect_language()
         
     # Extracts plain string verse from the Genius HTML version.
     def html_to_verse(self, html_verse):
@@ -48,6 +51,14 @@ class Song:
 
         for html_verse in verses:
             lyrics += [self.html_to_verse(html_verse)]
+            
+        if len(lyrics) == 0:
+            verses = BeautifulSoup(html, "html.parser").find("div", {"class": "lyrics"})
+            if (verses is None):
+                return ''
+            text = verses.text
+            text = text.replace('\n', ' ')
+            return text
 
         return ' '.join(lyrics)
     
@@ -122,13 +133,20 @@ class Song:
         # If author was not found return two empty strings.
         return '', ''
     
+    def detect_language(self):
+        if self.lyrics == '':
+            return ''
+        else:
+            return langdetect.detect(self.lyrics)
+    
     # Converts the song object into a dictionary that can easily be saved as JSON object.
     def to_dict(self):
-        obj            = dict()
-        obj['url']     = self.url
-        obj['title']   = self.title
-        obj['author']  = self.author
-        obj['lyrics']  = self.lyrics
-        obj['credits'] = self.credits
+        obj             = dict()
+        obj['url']      = self.url
+        obj['title']    = self.title
+        obj['author']   = self.author
+        obj['lyrics']   = self.lyrics
+        obj['credits']  = self.credits
+        obj['language'] = self.language
         
         return obj
