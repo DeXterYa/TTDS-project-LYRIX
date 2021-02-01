@@ -9,6 +9,7 @@ from collections      import OrderedDict
 from numpy            import argsort
 from numpy            import array
 from json             import loads
+from tqdm             import trange
 
 # Class for preprocessing text. Applies case folding, tokenization and stemming and
 # outputs preprocessed text in a uniform format. Has 1 field:
@@ -187,7 +188,10 @@ class SearchEngine:
         texts      = self.loadJSON(fileName)
         
         # Preprocess each document.
-        texts = [self.preprocessor.preprocess(txt) for txt in texts]
+        for txt_idx in trange(len(texts), desc='Preprocessing: '):
+            txt            = texts[txt_idx]
+            txt            = self.preprocessor.preprocess(txt)
+            texts[txt_idx] = txt
 
         # Get the text of all collection.
         collection = ' '.join(texts).split()
@@ -203,7 +207,8 @@ class SearchEngine:
         lexicon.sort()
 
         # Word at a time index building.
-        for word in lexicon:
+        for word_idx in trange(len(lexicon), desc='Index building: '):
+            word      = lexicon[word_idx]
             termIndex = TermIndex(word)
 
             for idx, text in enumerate(texts):
