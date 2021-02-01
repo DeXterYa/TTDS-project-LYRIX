@@ -48,9 +48,9 @@ $ python crawl.py --type song_crawl --links_file ./outputs/all_links_0.txt --num
 5. `--links_file` - Only for song_crawl. `.txt` file with links to Genius song pages. One link at a line.
 
 ## TO DO:
-- [ ] Fix failing requests
+- [x] Fix failing requests
 - [ ] Clear HTML character encodings
 - [ ] Extract song image
 - [ ] Extract name of song album
 - [ ] Extract tags
-- [ ] Extract song language *(possibly add multithreading language detection module)*
+- [x] Extract song language *(possibly add multithreading language detection module)*
