@@ -1,41 +1,27 @@
-# TTDS 20-21 LYRIX: Lyrics Search Engine
-
-Structure of this project:
-
+# INDEX
+## How to use
 ```
-.
-├── flask
-│   ├── lyrix
-│   │   ├── forms.py
-│   │   ├── __init__.py
-│   │   ├── routes.py
-│   │   ├── static
-│   │   │   ├── main.css
-│   │   │   └── profile_pics
-│   │   │       ├── dexter.jpg
-│   │   │       ├── maciej.jpg
-│   │   │       ├── marcin.jpg
-│   │   │       └── matus.jpg
-│   │   └── templates
-│   │       ├── about.html
-│   │       ├── home.html
-│   │       └── layout.html
-│   └── run.py
-├── README.md
-└── requirements.txt
-
-
+from index import SearchEngine
 ```
-
-In the `./flask/`, we adopted a package structure.
-
-To run this application,
-
+### Build new index
 ```
-$ pip install -r requirements.txt
-$ cd flask
-$ python run.py
+se = SearchEngine(fileName='all_songs.json', indexReady=False)
 ```
-`./flask/lyrix/` contains all the other files. `./flask/lyrix/static/` contains a css file and profile pics for team members. `./flask/lyrix/templates/` contains all the html files.
-(`layout.html` is the shared layout for all other html files) `./flask/lyrix/forms.py` contains search fields (a form) in the home page. 
-`./flask/lyrix/routes.py` contains all the routes in the application.
+Inputs:
+* `fileName` - `.json` file with collection of songs scraped from Genius. The file should be a dictionary that maps a song ID to the corresponding song object *(dictionary)*
+
+Outputs:
+* `index.txt` - as in coursework, but positions of words in the text were replaced by simple term frequency since we are doing a ranked search.
+
+### Load Ready index
+```
+se = SearchEngine(fileName='index.txt', indexReady=True)
+```
+Input:
+* `fileName` - `.txt` file similar to `index.txt` from coursework. *(but term frequencies instead of positions in text )*
+### Answer single string query
+```
+documentIDs = se.rankedSearch(query_string)
+```
+Outputs:
+* `documentIDs` - sorted list of most relevant documents for a query. *(descending order)*

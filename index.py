@@ -236,57 +236,8 @@ class SearchEngine:
         with open('index.txt','w') as file:
             file.write(indexTxt) 
             file.close()
-
-    # Takes as an input .txt file with queryFile name. The file should have queries - each in single
-    # line in a document in a format specified by the coursework document:
-    # document: https://www.inf.ed.ac.uk/teaching/courses/tts/CW2020/assignment1.html.
-    # Ranked search is undertaken. Results of a query are output as a string in format specified 
-    # by coursework document. Additionally, the function saves such string in a .txt file. Results 
-    # are saved in results.ranked.txt.
-    def answerQueries(self, queryFile):
-
-        # Key is query id. Value is a list of answers to the query.
-        results = {}
-
-        with open(queryFile, 'r') as file:
-            for line in file:
-
-                # Parse single query in the input file.
-                firstSpace = line.index(' ')
-                queryId    = line[:firstSpace]
-
-                if line[-1] == '\n':
-                    query = line[firstSpace+1:-1]
-                else:
-                    query = line[firstSpace+1:]
-                
-                sortedDocs, sortedScores = self.rankedSearch(query)
-                result                   = [(sortedDocs[i], sortedScores[i]) for i in range(len(sortedDocs))]
-                results[queryId]         = result
-                
-            file.close()
-
-        outputTxt = ''
-
-        # Construct answer string that satisfies the format specified by coursework document. 
-        for queryId in results:
-            for docTuple in results[queryId]:
-
-                # docTuple[1] is score of document with docTuple[0] id
-                result     = str(docTuple[0]) + ',' + str(round(docTuple[1],4))
-                outputTxt += queryId + ',' + result + '\n'
-
-        # Save the answers in the appropriate file.
-        fileName = 'results.ranked.txt'
-
-        with open(fileName, 'w') as file:
-            file.write(outputTxt) 
-            file.close()
-
-        return outputTxt
     
-    # Performs ranked search for the query string. Outputs list of 150 most relevant documents and 
-    # list of their corresponding scores. 
+    # Performs ranked search for the query string. Outputs list of most relevant documents.
     def rankedSearch(self, query):
 
         # Preprocess the query
@@ -300,9 +251,8 @@ class SearchEngine:
         scores       = OrderedDict(sorted(scores.items())[::-1])
         idx          = list(argsort(list(scores.values()), kind='stable'))[::-1]
         sortedDocs   = list(array(list(scores.keys()))[idx])
-        sortedScores = list(array(list(scores.values()))[idx])
 
-        return sortedDocs[:150], sortedScores[:150]
+        return sortedDocs
     
     # Computes the TFIDF score for each document that contains one of the provided query terms.
     # Result is returned in a dictionary in which each document id is mapped to its score for the
@@ -326,32 +276,5 @@ class SearchEngine:
                     scores[docId] = scores[docId] + weight
 
         return scores
-
-# Runs the program - takes 2 arguments from the command line:
-# - argv[1] - name of txt or json file. The index is built from this file. If an argument is txt 
-#             file it is assumed that it holds an already built index, so it just loads it. 
-#             If a file is json, the index is built from lyrics in this file.
-# - argv[2] - the name of a txt file that holds the queries in the format specified by coursework 
-#             document.
-# If json file is provided the program will build an index out of this file and save it in 
-# index.txt. 
-# If txt file is provided as argv[1] index will not be saved because it is assumed that 
-# it is already saved.
-# Answers to the queries will be saved in the results.ranked.txt file.
-# Otherwise, answers will be saved in results.boolean.txt.
-def main():
-    fileName = argv[1]
-
-    if fileName[-4:] == '.txt':
-        indexReady = True
-    else:
-        indexReady = False
-    
-    # Builds index
-    searchEngine = SearchEngine(fileName, indexReady)
-    queryFile    = argv[2]
-
-    # Answers queries.
-    searchEngine.answerQueries(queryFile)
 
     
