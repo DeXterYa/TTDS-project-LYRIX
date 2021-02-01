@@ -30,7 +30,8 @@ class Song:
     def __init__(self, link):
 
         self.url      = link
-        html       = requests.get(link).text
+        request       = requests.get(link)
+        html          = request.text
         self.lyrics   = self.extract_lyrics(html)
         self.credits  = {**self.extract_credits(html, 'credits'), **self.extract_credits(html, 'headers')}
         self.title    = self.extract_title(html)
@@ -50,6 +51,14 @@ class Song:
 
         for html_verse in verses:
             lyrics += [self.html_to_verse(html_verse)]
+            
+        if len(lyrics) == 0:
+            verses = BeautifulSoup(html, "html.parser").find("div", {"class": "lyrics"})
+            if (verses is None):
+                return ''
+            text = verses.text
+            text = text.replace('\n', ' ')
+            return text
 
         return ' '.join(lyrics)
     
