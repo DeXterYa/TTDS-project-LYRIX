@@ -47,5 +47,7 @@ In this branch,
   
 * Added index.py to the application. genius_index.json is stored outside this directory because of its size.
 * Database name: lyrix; Collection name: genius.
+* Return elapsed time 
+* Added an icon for the tab in browsers
 
 
