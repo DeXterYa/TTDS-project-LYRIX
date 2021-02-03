@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request
-from lyrix import app
+from lyrix import app, se
 from lyrix.forms import SearchBox
 from lyrix.models import Lyrics
 
@@ -15,10 +15,13 @@ def home():
 
 	# acquire current page of the search results
 	page = request.args.get('page', 1, type=int)
-
-
-
-	songs = Lyrics.objects(artist="Taylor Swift").paginate(page=page, per_page=2)
+	
+	if lyrics:
+		documentIDs = se.rankedSearch(lyrics)[:20]
+		songs = Lyrics.objects(id__in=documentIDs).paginate(page=page, per_page=4)
+	else:
+		songs = None
+	
 	form = SearchBox()
 	# green flash message on top of the search box
 	if form.validate_on_submit():

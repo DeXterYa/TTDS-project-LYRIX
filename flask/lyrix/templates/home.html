@@ -157,8 +157,8 @@
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
           <div class="media-body">
             <div class="article-metadata">
-              <a class="mr-2" href="#">{{ song.artist }}</a>
-              <small class="text-muted">{{ song.song }}</small>
+              <a class="mr-2" href="#">{{ song.author[0] }}</a>
+              <small class="text-muted">{{ song.title }}</small>
             </div>
           </div>
         </article>
