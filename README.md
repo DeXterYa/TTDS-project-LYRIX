@@ -12,6 +12,8 @@ Structure of this project:
 │   │   ├── models.py
 │   │   ├── routes.py
 │   │   ├── static
+│   │   │   ├── icons
+│   │   │   │   └── favicon.ico
 │   │   │   ├── main.css
 │   │   │   └── profile_pics
 │   │   │       ├── dexter.jpg
@@ -25,6 +27,7 @@ Structure of this project:
 │   └── run.py
 ├── README.md
 └── requirements.txt
+
 
 ```
 
