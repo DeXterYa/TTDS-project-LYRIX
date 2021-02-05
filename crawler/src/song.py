@@ -1,6 +1,7 @@
 import requests
 import re
 import langdetect
+from unidecode import unidecode
 
 from bs4 import BeautifulSoup
 
@@ -37,6 +38,8 @@ class Song:
         self.title    = self.extract_title(html)
         self.author   = self.extract_author(html)
         self.language = self.detect_language()
+        self.image    = self.extract_image(html)
+        self.album    = self.extract_album(html)
         
     # Extracts plain string verse from the Genius HTML version.
     def html_to_verse(self, html_verse):
@@ -46,21 +49,36 @@ class Song:
         return ' '.join(verse)
     
     def extract_lyrics(self, html):
-        verses = re.findall('<div class="Lyrics__Container-sc-1ynbvzw-2 jgQsqn">.*?</div>', html)
-        lyrics = []
-
-        for html_verse in verses:
-            lyrics += [self.html_to_verse(html_verse)]
-            
-        if len(lyrics) == 0:
+        verses = BeautifulSoup(html, "html.parser").find("div", {"class": "Lyrics__Container-sc-1ynbvzw-2 jgQsqn"})
+        if verses is None:
             verses = BeautifulSoup(html, "html.parser").find("div", {"class": "lyrics"})
-            if (verses is None):
+            
+            
+        if (verses is not None):
+            text = unidecode(verses.text)
+            text = text.replace('\n', '')
+            if (text == ''):
                 return ''
-            text = verses.text
-            text = text.replace('\n', ' ')
-            return text
-
-        return ' '.join(lyrics)
+            else:
+                return text
+        
+        return ''
+    
+    def extract_image(self, html):
+        link = BeautifulSoup(html, "html.parser").find("img", {"class": "cover_art-image"})
+        if link is None:
+            link = BeautifulSoup(html, "html.parser").find("img", {"class": "SizedImage__NoScript-sc-1hyeaua-1 hYJUSb"})
+            
+        if link is not None:
+            return link.get('src')
+        
+        return ""
+    
+    def extract_album(self, html):
+        # WORK IN PROGRESS
+        # album = BeautifulSoup(html, "html.parser").findAll("span", {"class": "metadata_unit-info"})
+        # print(album)
+        return ''
     
     # Extract single type of metadata.
     def extract_credit(self, html, credit_type):
@@ -134,10 +152,10 @@ class Song:
         return '', ''
     
     def detect_language(self):
-        if self.lyrics == '':
-            return ''
-        else:
+        try:
             return langdetect.detect(self.lyrics)
+        except:
+            return 'unknown'
     
     # Converts the song object into a dictionary that can easily be saved as JSON object.
     def to_dict(self):
@@ -148,5 +166,7 @@ class Song:
         obj['lyrics']   = self.lyrics
         obj['credits']  = self.credits
         obj['language'] = self.language
+        obj['image_url']= self.image
+        obj['album']    = self.album
         
         return obj
