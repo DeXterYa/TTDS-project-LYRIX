@@ -26,7 +26,7 @@ crawler
 #### Link crawl
 Crawls lists of Genius songs such as this: https://genius.com/artists/songs?for_artist_page=1 and extracts the links. The links are saved in `crawler/outputs/all_links_{id}.txt` file, link at a line. Some of such pages are empty. 
 #### Song crawl
-Given the `.txt` file with links to pages with Genius lyrics, scrapes the songs' data. There should be one link at a line in the input file. *(Intended Use: the output of link crawl should be an input of song crawl)* Saves the songs in `crawler/outputs/all_songs_{id}.json` file. The `all_songs.json` file is a list of dictionaries that represent a song. An example of a JSON object that represents a song can be found in `crawler/example.json`. The requests sometimes fail, so the crawler also saves the links on which scraping failure occurred in `crawler/outputs/all_bad_links_{id}.txt` file. *(Currently about half of the requests fail)* Scraping songs from this file often succeeds later.
+Given the `.txt` file with links to pages with Genius lyrics, scrapes the songs' data. There should be one link at a line in the input file. *(Intended Use: the output of link crawl should be an input of song crawl)* Saves the songs in `crawler/outputs/all_songs_{id}.json` file. The `all_songs.json` file is a list of dictionaries that represent a song. An example of a JSON object that represents a song can be found in `crawler/example.json`. The requests sometimes fail, so the crawler also saves the links on which scraping failure occurred in `crawler/outputs/all_bad_links_{id}.txt` file.
 
 Example link to Genius lyrics:
 https://genius.com/Kanye-west-lift-yourself-lyrics
@@ -48,9 +48,6 @@ $ python crawl.py --type song_crawl --links_file ./outputs/all_links_0.txt --num
 5. `--links_file` - Only for song_crawl. `.txt` file with links to Genius song pages. One link at a line.
 
 ## TO DO:
-- [x] Fix failing requests
-- [ ] Clear HTML character encodings
-- [ ] Extract song image
 - [ ] Extract name of song album
 - [ ] Extract tags
-- [x] Extract song language *(possibly add multithreading language detection module)*
+- [ ] Extract link to YouTube music video
