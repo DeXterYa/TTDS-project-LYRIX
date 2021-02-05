@@ -46,8 +46,3 @@ $ python crawl.py --type song_crawl --links_file ./outputs/all_links_0.txt --num
 3. `--start` - Only for link_crawl. Defines the {page_id} of a Genius page with a list of links from which crawling should start.  https://genius.com/artists/songs?for_artist_page={page_id}. *(inclusive)*
 4. `--end` - Only for link_crawl. Defines the {page_id} of a Genius page with a list of links on which crawling should end. https://genius.com/artists/songs?for_artist_page={page_id}. *(exclusive)*
 5. `--links_file` - Only for song_crawl. `.txt` file with links to Genius song pages. One link at a line.
-
-## TO DO:
-- [ ] Extract name of song album
-- [ ] Extract tags
-- [ ] Extract link to YouTube music video
