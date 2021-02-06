@@ -9,3 +9,4 @@ WTForms==2.3.3
 bs4==4.9.3
 langdetect==1.0.8
 unidecode==1.2.0
+tqdm==4.56.0
