@@ -6,6 +6,7 @@ import multiprocessing as mp
 from bs4       import BeautifulSoup
 from pathlib   import Path
 from src.utils import garbage_collector, combine_results
+from tqdm      import tqdm
 
 # Gathers links to Genius songs which can be found under this link: 
 # https://genius.com/artists/songs?for_artist_page={page_number}
@@ -20,14 +21,23 @@ from src.utils import garbage_collector, combine_results
 def crawl_songs_links(start, interval, process_num):
     base_link = 'https://genius.com/artists/songs?for_artist_page='
 
+    # Display process number next to progress bar.
+    tqdm_text = 'process ' + '{}'.format(process_num).zfill(2)
+
     with open('./temporary/links/links_' + str(process_num) + '.txt', 'w') as file:
 
-        for page_idx in range(start, start + interval):
-            html = requests.get(base_link + str(page_idx)).text
-            soup = BeautifulSoup(html, 'html.parser')
+        # Track progress with tqdm progress bar.
+        with tqdm(total=interval, desc=tqdm_text, position=process_num+1) as pbar:
 
-            for link in soup.find_all('a', 'song_name'):
-                file.write(link['href'] + '\n')
+            for page_idx in range(start, start + interval):
+                html = requests.get(base_link + str(page_idx)).text
+                soup = BeautifulSoup(html, 'html.parser')
+
+                for link in soup.find_all('a', 'song_name'):
+                    file.write(link['href'] + '\n')
+
+                # Update the progress bar.
+                pbar.update(1)
                 
         file.close()
 
@@ -45,27 +55,29 @@ def gather_song_links(start, end, num_processes):
     Path('./temporary').mkdir(exist_ok=True)
     Path('./temporary/links').mkdir(exist_ok=True)
 
+    # "Windows support" whatever it means XD
+    mp.freeze_support()
+
+    # Copied from https://leimao.github.io/blog/Python-tqdm-Multiprocessing/.
+    pool = mp.Pool(processes=num_processes, initargs=(mp.RLock(),), initializer=tqdm.set_lock)
+
     # interval is number of pages with links to songs lyrics that each thread should crawl.
     interval      = int(math.ceil((end - start) / num_processes))
     all_processes = []
 
     for process_num in range(num_processes - 1):
         start_idx      = start + interval * process_num
-        all_processes += [mp.Process(target=crawl_songs_links, args=(start_idx, interval, process_num))]
+        all_processes += [pool.apply_async(crawl_songs_links, args=(start_idx, interval, process_num))]
 
     # If the number of pages to crawl is not divisible by number of processes then the last process
     # should crawl smaller number of pages.
     last_interval  = (end - start) - (num_processes - 1) * interval
     start_idx      = start + interval * (num_processes - 1)
-    all_processes += [mp.Process(target=crawl_songs_links, args=(start_idx, last_interval, num_processes - 1))]
-
-    # Start processes.
-    for process in all_processes:
-        process.start()
-
-    # Finish processes.
-    for process in all_processes:
-        process.join()
+    all_processes += [pool.apply_async(crawl_songs_links, args=(start_idx, last_interval, num_processes - 1))]
+    
+    # Run the workers.
+    pool.close()
+    [job.get() for job in all_processes]
 
     # Combine results of mulitple threads into one file, remove temporary files.
     combine_results('links')
