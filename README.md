@@ -52,5 +52,5 @@ In this branch,
 * Database name: lyrix; Collection name: genius.
 * Return elapsed time 
 * Added an icon for the tab in browsers
-
+* Used cards to represent search results
 

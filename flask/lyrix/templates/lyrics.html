@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+	
+
+	<div class="card mb-3" style="max-width: 800px;">
+	  <div class="row g-0">
+	    <div class="col-md-4">
+	      <img class="article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}" >
+	    </div>
+	    <div class="col-md-8">
+	      <div class="card-body">
+	        <h5 class="card-title">{{ song.title }}</h5>
+	        <p class="card-text">Author: {{ song.author[0] }}</p>
+	        <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+	        <a href="{{ url_for('lyrics', song_id=song.id) }}" class="stretched-link text-decoration-none"></a>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<nav class="navbar navbar-light bg-light px-3">
+			<a class="navbar-brand" ><h1 class="display-6">Lyrics</h1></a>
+		</nav>
+	<div class="content-section" style="max-width: 800px;">
+		<p class="lead">
+			{{ song.lyrics }}
+		</p>
+	</div>
+
+	
+{% endblock content %}

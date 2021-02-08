@@ -35,7 +35,18 @@ def home():
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate)
 
+
 @app.route('/about') # the about page of the website
 def about():
     return render_template('about.html', title='About')
+
+
+@app.route('/lyrics', methods=['GET', 'POST']) 
+def lyrics():
+	song_id = request.args.get('song_id', None)
+	if song_id:
+		song = Lyrics.objects(id=song_id)[0]
+
+	return render_template('lyrics.html', song=song)
+
 

@@ -153,7 +153,24 @@
 
 
 	{% for song in songs.items %}
-        <article class="media content-section">
+	
+	<div class="card mb-3" style="max-width: 800px;">
+	  <div class="row g-0">
+	    <div class="col-md-4">
+	      <img class="article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}" >
+	    </div>
+	    <div class="col-md-8">
+	      <div class="card-body">
+	        <h5 class="card-title">{{ song.title }}</h5>
+	        <p class="card-text">Author: {{ song.author[0] }}</p>
+	        <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+	        <a href="{{ url_for('lyrics', song_id=song.id) }}" class="stretched-link text-decoration-none"></a>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+<!--         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
           <div class="media-body">
             <div class="article-metadata">
@@ -161,7 +178,7 @@
               <small class="text-muted">{{ song.title }}</small>
             </div>
           </div>
-        </article>
+        </article> -->
     {% endfor %}
     {% endif %}
 

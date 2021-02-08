@@ -61,8 +61,8 @@ a.article-title:hover {
 }
 
 .article-img {
-  height: 65px;
-  width: 65px;
+  height: 180px;
+  width: 120px;
   margin-right: 16px;
 }
 
@@ -81,4 +81,9 @@ a.article-title:hover {
   width: 25px;
   height: 25px;
   vertical-align: middle;
+}
+
+a.custom-card,
+a.custom-card:hover {
+  color:inherit;
 }
