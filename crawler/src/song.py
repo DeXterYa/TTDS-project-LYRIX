@@ -101,7 +101,7 @@ class Song:
         album = soup.find_all('div', {'class': 'metadata_unit'})
 
         if len(album) > 0: 
-            album = [meta.a.text for meta in album if 'Album' in meta.text]
+            album = [meta.a.text for meta in album if meta is not None and 'Album' in meta.text]
 
             if len(album) > 0:
                 return unidecode(album[0])
