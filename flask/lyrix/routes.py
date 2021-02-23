@@ -93,7 +93,7 @@ def lyrics():
 		song = Lyrics.objects(id=song_id)[0]
 
 	query = '"' + song.title +'"' + ' artist:"' + song.author[0] + '"'
-	
+	token, img_url = "", ""
 	sp_result = sp.search(q=query, limit=1)
 	for idx, track in enumerate(sp_result['tracks']['items']):
 		token = "https://open.spotify.com/embed/track/" + track['external_urls']['spotify'].rsplit('/', 1)[-1]
