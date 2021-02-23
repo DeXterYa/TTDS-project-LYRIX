@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from lyrix.index import SearchEngine
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 app = Flask(__name__)
 # secret key for wtforms
@@ -22,6 +24,9 @@ db = MongoEngine(app)
 
 se = SearchEngine()
 se.loadIndex(fileName='../../index/genius_index.json')
+
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="e03291f52cfb40c284711b9e6459b14d",
+                                                           client_secret="929ee5a32b5140b19c97358fc70fb655"))
 
 
 from lyrix import routes

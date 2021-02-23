@@ -138,9 +138,9 @@
 
 	{% if lyrics or singer or startdate or enddate %}
 
-	{% for page_num in songs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+	{% for page_num in page_list %}
       {% if page_num %}
-        {% if songs.page == page_num %}
+        {% if page == page_num %}
           <a class="btn btn-info mb-4" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page=page_num) }}">{{ page_num }}</a>
         {% else %}
           <a class="btn btn-outline-info mb-4" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page=page_num) }}">{{ page_num }}</a>
@@ -152,8 +152,8 @@
 
 
 
-	{% for song in songs.items %}
-	
+	{% for song in songs %}
+	{% if loop.index0 in range(start_idx, end_idx) %}
 	<div class="card mb-3" style="max-width: 800px;">
 	  <div class="row g-0">
 	    <div class="col-md-4">
@@ -161,14 +161,15 @@
 	    </div>
 	    <div class="col-md-8">
 	      <div class="card-body">
-	        <h5 class="card-title">{{ song.title }}</h5>
-	        <p class="card-text">Author: {{ song.author[0] }}</p>
+	        <h5 class="card-title">{{ song['title'] }}</h5>
+	        <p class="card-text">Author: {{ song['author'][0] }}</p>
 	        <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-	        <a href="{{ url_for('lyrics', song_id=song.id) }}" class="stretched-link text-decoration-none"></a>
+	        <a href="{{ url_for('lyrics', song_id=song['id']) }}" class="stretched-link text-decoration-none"></a>
 	      </div>
 	    </div>
 	  </div>
 	</div>
+	{% endif %}
 
 <!--         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
