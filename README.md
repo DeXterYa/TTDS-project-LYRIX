@@ -195,7 +195,7 @@ The raw songs must be located in a set of files in the `index2/inputs` directory
  "dear": [1959937, 2],
  ...}
 ```
-The preprocessing is done similarly to the description in [Searchin algorithm](#searching-algorithm) with few exceptions. The song text is stemmed with only one stemmer that corresponds to its detected language. The song is treated as a bag of words, so term frequencies matter. The song text is a concatenation of:
+The preprocessing is done similarly to the description in [Searching algorithm](#searching-algorithm) with few exceptions. The song text is stemmed with only one stemmer that corresponds to its detected language. The song is treated as a bag of words, so term frequencies matter. The song text is a concatenation of:
 + **title**
 + **author name _(without a link)_**
 + **lyrics**
@@ -281,3 +281,13 @@ database.command({"planCacheClear": "song_index"})
 ``` 
 However, I have not tried this method yet. [Source](https://stackoverflow.com/questions/5319754/cross-reference-named-anchor-in-markdown)
 # Extensions
+If we decide that stemming a query with all possible stemmers is not valuable, then we can easily let the user specify the language that he wants to use _(for example via toolbar in the UI)_. Then we could augment the `ranked_search` function in `query.py` so that it takes the query language as another argument and then stems all of the terms with only one stemmer. This would require changing line 19 of the `query.py` from:
+```
+query = preprocessor.preprocess(query, of_type='query')
+```
+to something like:
+```
+query = preprocessor.preprocess(query, of_type='song', lang='es')
+```
+for example to stem the query with Spanish stemmer only. We could then also filter the returned songs to have only those with appropriate language.
+***
