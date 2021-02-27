@@ -9,19 +9,25 @@
 - [Index building](#index-building)
 	- [The easy way](#the-easy-way)
 	- [The hard way _(manual)_](#the-hard-way-manual)
+		- [Split the dataset](#split-the-dataset)
+		- [Preprocessing](#preprocessing)
+		- [Convert raw _term frequencies_ to _BM25 TF-components_](#convert-raw-term-frequencies-to-bm25-tf-components)
+		- [Compute and partition the lexicon](#compute-and-partition-the-lexicon)
+		- [Build index](#build-index)
+		- [Compute full _BM25 scores (with IDF-components)_](#compute-full-bm25-scores-with-idf-components)
 - [Problems](#problems)
 - [Extensions](#extensions)
 # How do I access the dataset?
 ### [Dataset access](https://drive.google.com/drive/folders/1mAWpsMSa8yV_wQ3U1l8dK9FtwvLOc7NA?usp=sharing)
 
 
-#### Notes:
+#### Notes
 + There are two directories **_inputs_** and **_indexes_**.
 + **_inputs_** directory contains **_37_** `raw_<file_id>.json` files. Each file contains a list of song objects that we have scraped from Genius. Each file contains at most 50,000 songs. This number of songs was chosen so that loading such a file in Python does not take more than **_400 MB of RAM_**. Together the 37 files compose our overall dataset of **_1,809,543_** songs.
 + The song objects already have a `_id` field used as ID by MongoDB.
 + **_indexes_** directory contains **_128_** `index_<file_id>.json` files. Each file contains a list of inverted index objects for separate terms. Our overall index was split into 128 chunks so that loading any index file into Python memory does not take more than **_500 MB of RAM_**.
 
-#### Format of inverted index object for a specific term:
+#### Format of inverted index object for a specific term
 ```
 {'t': 'tellepath',
  'p': [[334794, 1.5978419346570618],
@@ -105,7 +111,7 @@ relevant_songs = ranked_search(query, preprocessor, songs_collection, index_coll
 + `top_k` is an integer that specifies the length of the returned `relevant_songs` list. _(The larger it is the longer the querying takes, as more records must be retrieved from the database)_
 
 
-#### Searching algorithm:
+#### Searching algorithm
 + Use unidecode to remove _"weird"_ characters. The same mapping was done on the songs. Examples: convert 
 	+ _ł_ to _l_
 	+  _ą_ to _a_
@@ -132,6 +138,57 @@ relevant_songs = ranked_search(query, preprocessor, songs_collection, index_coll
 ### The easy way
 
 ### The hard way _(manual)_
+#### Split the dataset
+```
+from src.utils import split_dataset
+
+dataset = 'c:/path/to/your/dataset/json/file'
+split   = 50,000
+
+split_dataset(dataset, split)
+```
+#### Preprocessing
+```
+from src.workers import preprocess_collection
+
+num_processes = 16
+
+if  __name__ == '__main__':
+	mp.freeze_support()
+	preprocess_collection(num_processes)
+```
+#### Convert raw _term frequencies_ to _BM25 TF-components_
+```
+from src.index import compute_bm25_tfs
+
+compute_bm25_tfs()
+```
+#### Compute and partition the lexicon
+```
+from src.index import partition_lexicon
+
+num_index_files = 8
+
+partition_lexicon(num_index_files)
+```
+
+#### Build index
+```
+from src.index import build_index
+
+num_index_files = 8
+
+build_index(num_index_files)
+```
+
+#### Compute full _BM25 scores (with IDF-components)_
+```
+from src.index import compute_bm25_idfs
+
+collections_size = 1809543
+
+compute_bm25_idfs(collection_size)
+```
 
 # Problems
 
