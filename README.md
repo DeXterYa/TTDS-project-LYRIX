@@ -6,6 +6,7 @@
   * [Load index into MongoDB](#load-index-into-mongodb)
   * [Time to Query!!!](#time-to-query)
 	  * [Searching algorithm](#Searching-algorithm)
+	  * [Current BM25 function](#current-bm25-function)
 - [Index building](#index-building)
 	- [The easy way](#the-easy-way)
 	- [The hard way _(manual)_](#the-hard-way-manual)
@@ -134,6 +135,8 @@ relevant_songs = ranked_search(query, preprocessor, songs_collection, index_coll
 + Now the query is a sequence of terms. Stem each term in the query with every **_NLTK Snowball language stemmer_** that is available. _(except for Arabic and Russian cause we do not have any Arabic or Russian songs in the collection. Thus, our list of supported languages includes Danish, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Portuguese, Romanian, Spanish, and Swedish)_ We add each newly obtained stem form of a word to a **_set_** of all stem forms obtained for all terms in the query. Now use the inverted index to query each term from the set. 
 + The frequency of terms in the query is not taken into account. Particular term either is or is not in the query. _(That's why I have highlighted the word **set** )_
 + In the inverted index, we store the precomputed **_BM25 scores_** for all term-document pairs. We can easily retrieve the indexes for the terms in the query and sum the weights for all terms in all documents, then sort the documents by their cumulative scores and return only the most relevant ones.
+#### Current BM25 function
+[Taken from lecture. Slide 11.](https://www.inf.ed.ac.uk/teaching/courses/tts/handouts/08RankedRetrieval2.pdf)
 
 # Index building
 ### The easy way
@@ -156,7 +159,9 @@ python runner.py --dataset path/to/dataset/json/file --split 50000 --num_process
 
 **WARNING: The total size of the song collection is currently hardcoded. _(1,809,543)_ If you want to use a different dataset you have to change this value manually in the code. _(Line 36 in `runner.py`)_**
 
+
 ### The hard way _(manual)_
+The index building pipeline can also be decomposed into the steps below. If you change some late part of the pipeline then you may want to avoid building the index from scratch and instead for example use already preprocessed song texts. _(Save time by avoiding preprocessing once again)_ This can be done by using the following API.
 #### Split the dataset
 ```
 from src.utils import split_dataset
@@ -166,8 +171,13 @@ split   = 50000
 
 split_dataset(dataset, split)
 ```
+Splits the huge dataset with all songs into a set of files such that each file has at most `split` songs. The small files are stored as `index2/inputs/raw_<file_id>.json`. Also removes dots `'.'` from names of any keys in the `credits` field of any song. _(MongoDB does not accept dictionaries with dots in keys)_
+
+**WARNING: CAN OVERWRITE FILES IN THE `index2/inputs` DIRECTORY.**
 #### Preprocessing
 ```
+import multiprocessing as mp
+
 from src.workers import preprocess_collection
 
 num_processes = 16
@@ -176,12 +186,37 @@ if  __name__ == '__main__':
 	mp.freeze_support()
 	preprocess_collection(num_processes)
 ```
+
+The raw songs must be located in a set of files in the `index2/inputs` directory and have `raw_<file_id>.json` names. The `preprocess_collection` function finds all such files and preprocesses them one at a time with the `num_processes` number of processes. Outputs `index2/preprocessed/ready<file_id>.json` files. Each song in a `ready<file_id>.json` has a form of an inverted index - a dictionary in which each term is mapped to a tuple, where the first element is a song ID and the second element is the document frequency of the term in that document. Example:
+```
+{"to":   [1959937, 4], 
+ "you":  [1959937, 4], 
+ "my":   [1959937, 2], 
+ "dear": [1959937, 2],
+ ...}
+```
+The preprocessing is done similarly to the description in [Searchin algorithm](#searching-algorithm) with few exceptions. The song text is stemmed with only one stemmer that corresponds to its detected language. The song is treated as a bag of words, so term frequencies matter. The song text is a concatenation of:
++ **title**
++ **author name _(without a link)_**
++ **lyrics**
++ **album**
++ **all tag names**
++ **any values in the `credits` field _(without links)_**
+
+Fields other than lyrics were included to allow users easier searching of songs. For example, a user does not know the song title, but he knows some lyrics and the author, now if he types the author in the query it will be easier to find the song that he is looking for as we have included the author name field in the song text.
+
+
+**WARNING: CAN OVERWRITE FILES IN THE `index2/preprocessed` DIRECTORY.**
+
 #### Convert raw _term frequencies_ to _BM25 TF-components_
 ```
 from src.index import compute_bm25_tfs
 
 compute_bm25_tfs()
 ```
+Should be run after the `preprocess_collection` function has terminated and its results were stored as `index2/preprocessed/ready_<file_id>.json` files. Loads such files and overwrites the raw term frequencies stored in them by the corresponding _BM25 TF-components_.
+
+**WARNING: OVERWRITES FILES IN THE `index2/preprocessed` DIRECTORY.**
 #### Compute and partition the lexicon
 ```
 from src.index import partition_lexicon
@@ -190,7 +225,9 @@ num_index_files = 8
 
 partition_lexicon(num_index_files)
 ```
+Should be run when the collection is already preprocessed and before building the index. `build_index` function requires the output of `partition_lexicon`. Computes the lexicon of the whole collection from the `index2/preprocessed/ready_<file_id>.json` files. Sorts the lexicon and splits it into `num_index_files` partitions. The splitting is done so that the total number of postings corresponding to all words in a split is roughly equal for all splits. _(This ensures that the index files are roughly equal in terms of memory)_ Saves each such partition _(list of terms)_ in a `./index2/lexicon_splits/split_<file_id>.json` file.
 
+**WARNING: CAN OVERWRITE FILES IN THE `index2/lexicon_splits` DIRECTORY.**
 #### Build index
 ```
 from src.index import build_index
@@ -199,16 +236,48 @@ num_index_files = 8
 
 build_index(num_index_files)
 ```
+Builds an inverted index from the preprocessed songs in `index2/preprocessed/ready_<file_id>.json`. The index is split among `num_index_files`. Saves the ready index files in `./index2/indexes/index_<file_id>.json`. `index_n.json` file contains inverted indexes for terms in `./index2/lexicon_splits/split_n.json` file.
 
+**WARNING: CAN OVERWRITE FILES IN THE `index2/indexes` DIRECTORY.**
 #### Compute full _BM25 scores (with IDF-components)_
 ```
 from src.index import compute_bm25_idfs
 
-collections_size = 1809543
+collection_size = 1809543
 
 compute_bm25_idfs(collection_size)
 ```
+`collection_size` is the total number of songs in the collection. _(currently must be specified manually)_ Should be run after the `build_index` function has terminated and its results were stored as `index2/indexes/index_<file_id>.json` files. Loads such files and overwrites the _BM25 TF-components_ stored in them by the corresponding total _BM25 scores_ that include the _IDF-components_ too.
+
+**WARNING: OVERWRITES FILES IN THE `index2/indexes` DIRECTORY.**
 
 # Problems
+Currently, the greatest problem lays in **inserting the data into MongoDB**. When we insert data into MongoDB it **caches** it instead of moving it to disk. This caching can take up to 6GB of RAM which is way too much for our server. I have looked at ways of preventing this error from happening. For example, [MongoDB documentation](https://docs.mongodb.com/manual/reference/configuration-options/) mentions that we can limit the amount of RAM taken by MongoDB cache by editing the **config file**. To find the file go to something like:
+```
+C:/Program Files/MongoDB/Server/4.4/bin/mongod.cfg
+```
+_(example from my computer)_
 
+then add the following lines to `storage` section:
+```
+wiredTiger:
+	engineConfig:
+		cacheSizeGB: 0.25
+inMemory:
+	engineConfig:
+		inMemorySizeGB: 0.25
+```
+I have tried it on my computer but it does not seem to work.
+___
+There also should be a way to clear the MongoDB cache with `pymongo` by issuing:
+```
+import pymongo
+
+client     = pymongo.MongoClient("mongodb://localhost:27017/")
+database   = client["lyrix"]
+collection = database["song_index"]
+
+database.command({"planCacheClear": "song_index"})
+``` 
+However, I have not tried this method yet. [Source](https://stackoverflow.com/questions/5319754/cross-reference-named-anchor-in-markdown)
 # Extensions
