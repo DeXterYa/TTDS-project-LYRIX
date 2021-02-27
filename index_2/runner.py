@@ -3,7 +3,7 @@ import multiprocessing as mp
 
 from src.utils   import split_dataset
 from src.workers import preprocess_collection
-from src.index   import build_index, partition_lexicon
+from src.index   import compute_bm25_tfs, partition_lexicon, build_index, compute_bm25_idfs
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -26,8 +26,14 @@ def main():
 
     split_dataset(args.dataset, args.split)
     preprocess_collection(args.num_processes)
-    partition_lexicon(args.num_splits)
+    compute_bm25_tfs()
+    partition_lexicon(args.num_indexes)
     build_index(args.num_indexes)
+
+    # 1,809,543 is hardcoded number of songs in collection right now. I should have 
+    # included it differently, but its kind of hard to compute when you have dataset
+    # in multiple files, so this was easier thing to do.
+    compute_bm25_idfs(1809543)
 
 if __name__ == '__main__':
     mp.freeze_support()
