@@ -134,8 +134,27 @@ relevant_songs = ranked_search(query, preprocessor, songs_collection, index_coll
 + Now the query is a sequence of terms. Stem each term in the query with every **_NLTK Snowball language stemmer_** that is available. _(except for Arabic and Russian cause we do not have any Arabic or Russian songs in the collection. Thus, our list of supported languages includes Danish, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Portuguese, Romanian, Spanish, and Swedish)_ We add each newly obtained stem form of a word to a **_set_** of all stem forms obtained for all terms in the query. Now use the inverted index to query each term from the set. 
 + The frequency of terms in the query is not taken into account. Particular term either is or is not in the query. _(That's why I have highlighted the word **set** )_
 + In the inverted index, we store the precomputed **_BM25 scores_** for all term-document pairs. We can easily retrieve the indexes for the terms in the query and sum the weights for all terms in all documents, then sort the documents by their cumulative scores and return only the most relevant ones.
+
 # Index building
 ### The easy way
+The full pipeline of building the index out of a huge dataset file is contained within the `runner.py` file. As the name of this file suggests it can be used to run the index building process from the beginning to the end. I have attempted to shorten the index building process with multiprocessing, however, it was not a good idea as RAM constraints are the most crucial when dealing with such a huge file. The whole process takes several hours, so I suggest running it overnight.
+
+Example of running:
+```
+python runner.py --dataset path/to/dataset/json/file --split 50000 --num_processes 16 --num_indexes 128
+```
+#### Commandline inputs:
++ `--dataset` - path to a JSON file that holds the entire dataset with all songs. The songs should be stored in a list of objects, where each object represents one song.
++ `--split` - The huge dataset with all the songs will be split into several smaller files to prevent RAM overflow. This parameter specifies how many songs each such smaller split should have. I suggest using something between 50,000 and 200,000. The larger the value of this parameter the faster the index building is, but the more likely it is that you will overflow the RAM.
++ `--num-processes` - Number of concurrent processes that you want to use when preprocessing the song collection. Other parts of the index building process are sequential due to high RAM requirements.
++ `--num_indexes` - Number of files in which the overall inverted index will be stored. `--num_indexes 128` means that the index will be stored in 128 JSON files. The larger this value is the longer the process takes, but the less RAM it requires. For fast index building I suggest using a very small value of this parameter _(8 for example)_, but not too small to prevent RAM overflow and costly back-and-forth disk accesses. _(When the index was ready I have further split the 8 index files into 128 ones manually)_ The optimal value of this parameter also depends on the value of the `--split` parameter. I suggest using something like `--split 100000 --num_indexes 8` when you have 16 GB RAM. If you have less RAM use smaller `--split` and more `--num_indexes`.
+#### Outputs:
++ `./index2/inputs/raw_<file_id>.json` - Set of files into which the original huge dataset was split. Each file contains at most `--split` song objects.
++ `./index2/preprocessed/ready_<file_id>.json` - Set of files that contain the song after preprocessing, in a inverted index format. So each song is dictionary that maps a term into a tuple where first element is the song id and the second one is the TF-component of the BM25 score.
++ `./index2/lexicon_splits/split_<file_id>.json` - Set of `--num-indexes` files. Each file contains a part of the overall collection lexicon. `index_n.json` contains the inverted index for terms in `split_n.json`
++ `./index2/indexes/index_<file_id>.json` - Set of `--num-indexes` files that together compose the overall inverted index for the collection.
+
+**WARNING: The total size of the song collection is currently hardcoded. _(1,809,543)_ If you want to use a different dataset you have to change this value manually in the code. _(Line 36 in `runner.py`)_**
 
 ### The hard way _(manual)_
 #### Split the dataset
@@ -143,7 +162,7 @@ relevant_songs = ranked_search(query, preprocessor, songs_collection, index_coll
 from src.utils import split_dataset
 
 dataset = 'c:/path/to/your/dataset/json/file'
-split   = 50,000
+split   = 50000
 
 split_dataset(dataset, split)
 ```
