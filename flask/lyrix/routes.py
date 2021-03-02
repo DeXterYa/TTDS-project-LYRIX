@@ -1,7 +1,8 @@
 from flask import render_template, url_for, flash, redirect, request
-from lyrix import app, se, sp
+from lyrix import app, sp, preprocessor, songs_collection, index_collection
+from lyrix.query import ranked_search
 from lyrix.forms import SearchBox
-from lyrix.models import Lyrics
+
 import time
 import math
 from itertools import groupby  
@@ -34,32 +35,7 @@ def home():
 	page_list = [i[0] for i in groupby(page_list)]
 	start_time = time.time()
 	if lyrics:
-		ids = se.rankedSearch(lyrics)[:num_idx]
-
-		stack = [];
-		for i in range(len(ids)-1, 0, -1):
-		    rec = {
-		        "$cond": [
-		            {"$eq": ["$id", ids[i-1]]}, i
-		        ]
-		    }
-		    if len(stack) == 0:
-		        rec["$cond"].append(i+1)
-		    else:
-		        lval = stack.pop()
-		        rec["$cond"].append(lval)
-		    
-		    stack.append(rec)
-
-		pipeline = [
-		    { "$match": {
-		        "id": { "$in": ids }}
-		    },
-		    { "$addFields": {
-		        "weight": stack[0]
-		    }},
-		    {"$sort" : {"weight" : 1}}]
-		songs = Lyrics.objects().aggregate(pipeline)
+		songs = ranked_search(lyrics, preprocessor, songs_collection, index_collection, num_idx)
 		
 		
 	else:
@@ -90,9 +66,11 @@ def lyrics():
 	song_id = request.args.get('song_id', None)
 
 	if song_id:
-		song = Lyrics.objects(id=song_id)[0]
+		song = songs_collection.find({'_id': int(song_id)})[0]
+	else:
+		song = None
 
-	query = '"' + song.title +'"' + ' artist:"' + song.author[0] + '"'
+	query = '"' + song['title'] +'"' + ' artist:"' + song['author'][0] + '"'
 	token, img_url = "", ""
 	sp_result = sp.search(q=query, limit=1)
 	for idx, track in enumerate(sp_result['tracks']['items']):
