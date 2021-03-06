@@ -17,29 +17,21 @@ def home():
 	startdate = request.args.get('startdate', None)
 	enddate = request.args.get('enddate', None)
 
-	# acquire current page of the search results
-	page = request.args.get('page', 1, type=int)
-	
-	num_idx = 40
-	per_page = 4
-	num_pages = math.ceil(num_idx / per_page)
+	# number of songs retrieved for a query
+	max_num_songs_retrieved = 40
 
-	if page != num_pages:
-		start_idx = (page - 1) * per_page
-		end_idx = page * per_page
-	else:
-		start_idx = (page - 1) * per_page
-		end_idx = num_idx
-
-	page_list = [i  if i==1 or i==page-1 or i==page or i==page+1 or i==page+2 or i==num_pages else 0 for i in range(1, num_pages + 1)]
-	page_list = [i[0] for i in groupby(page_list)]
 	start_time = time.time()
+
+	# retrieve songs (a list data structure)
 	if lyrics:
-		songs = ranked_search(lyrics, preprocessor, songs_collection, index_collection, num_idx)
-		
-		
+		songs = ranked_search(lyrics, preprocessor, songs_collection, index_collection, max_num_songs_retrieved)
 	else:
 		songs = None
+
+	num_songs_retrieved = len(songs)
+	# number of songs per page
+	songs_per_page = 5
+	num_pages = math.ceil(num_songs_retrieved / songs_per_page)
 
 	elapsed_time = time.time() - start_time
 
@@ -51,8 +43,8 @@ def home():
 		return redirect(url_for('home', lyrics=form.lyrics.data, singer=form.singer.data, startdate=form.year_begin.data, enddate=form.year_end.data))
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,
-	 						startdate=startdate, enddate=enddate, page=page, page_list=page_list,
-	 						start_idx=start_idx, end_idx=end_idx)
+	 						startdate=startdate, enddate=enddate, num_songs_retrieved=num_songs_retrieved, num_pages=num_pages,
+							 songs_per_page=songs_per_page)
 
 
 @app.route('/about') # the about page of the website

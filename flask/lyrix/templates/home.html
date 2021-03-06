@@ -1,3 +1,5 @@
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    
 {% extends "layout.html" %}
 {% block content %}
 	<form method="POST" action="" class="row g-3 align-items-center">
@@ -137,52 +139,88 @@
 	</form>
 
 	{% if lyrics or singer or startdate or enddate %}
+		<span id="songs_per_page" hidden>{{songs_per_page}}</span>
 
-	{% for page_num in page_list %}
-      {% if page_num %}
-        {% if page == page_num %}
-          <a class="btn btn-info mb-4" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page=page_num) }}">{{ page_num }}</a>
-        {% else %}
-          <a class="btn btn-outline-info mb-4" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page=page_num) }}">{{ page_num }}</a>
-        {% endif %}
-      {% else %}
-        ...
-      {% endif %}
-    {% endfor %}
+		{% if num_pages > 1 %}
+		<nav aria-label="Page navigation example">
+			<ul class="pagination">
+				{%for i in range(0, num_pages)%} 
+					<!-- make the first page active -->
+					{% if i == 0 %}
+						<li id="page_{{i+1}}" class="page-item active"><a id="page_button_{{i+1}}" class="page-link" href="#">{{i+1}}</a></li>
+					{%else%}
+						<li id="page_{{i+1}}" class="page-item"><a id="page_button_{{i+1}}" class="page-link" href="#">{{i+1}}</a></li>
+					{%endif%}
+				{%endfor%}
+			</ul>
+		</nav>
+		{% endif %}
 
+		{% for i in range(0, num_songs_retrieved) %}
+			{% if i < songs_per_page%}
+			<div id="song_box_{{i}}" class="card mb-3" style="max-width: 800px;">
+			{%else%}
+			<div id="song_box_{{i}}" class="card mb-3" hidden style="max-width: 800px;">
+			{%endif%}
+				<div class="row g-0">
+					<div class="col-md-4">
+					<img class="article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}" >
+					</div>
+					<div class="col-md-8">
+					<div class="card-body">
+						<h5 class="card-title">{{ songs[i]['title'] }}</h5>
+						<p class="card-text">Author: {{ songs[i]['author'][0] }}</p>
+						<!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+						<a href="{{ url_for('lyrics', song_id=songs[i]['_id']) }}" class="stretched-link text-decoration-none"></a>
+					</div>
+					</div>
+				</div>
+			</div>
 
-
-	{% for song in songs %}
-	{% if loop.index0 in range(start_idx, end_idx) %}
-	<div class="card mb-3" style="max-width: 800px;">
-	  <div class="row g-0">
-	    <div class="col-md-4">
-	      <img class="article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}" >
-	    </div>
-	    <div class="col-md-8">
-	      <div class="card-body">
-	        <h5 class="card-title">{{ song['title'] }}</h5>
-	        <p class="card-text">Author: {{ song['author'][0] }}</p>
-	        <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-	        <a href="{{ url_for('lyrics', song_id=song['_id']) }}" class="stretched-link text-decoration-none"></a>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	{% endif %}
-
-<!--         <article class="media content-section">
-          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="#">{{ song.author[0] }}</a>
-              <small class="text-muted">{{ song.title }}</small>
-            </div>
-          </div>
-        </article> -->
-    {% endfor %}
+			<!--    
+				<article class="media content-section">
+					<img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
+					<div class="media-body">
+					<div class="article-metadata">
+						<a class="mr-2" href="#">{{ songs[i].author[0] }}</a>
+						<small class="text-muted">{{ songs[i].title }}</small>
+					</div>
+					</div>
+				</article> 
+			-->
+		{% endfor %}
     {% endif %}
 
+<script>
+$( document ).ready(function() {
+	$(".page-link").on("click", function() {
+		// disactivate the previous page and activate the clicked page
+		let previous_page_number = $("li.active").text(),
+			clicked_page_number  = $(this).text()
+		$("li.active").removeClass("active")		
+		$("#page_" + clicked_page_number).addClass("active")
 
+		toggle_songs(previous_page_number, clicked_page_number)
+	});
+
+	// toggle songs that are displayed
+	function toggle_songs(previous_page_number, clicked_page_number) {
+		let num_songs_per_page = $("#songs_per_page").text()
+		
+		// hide songs that were previously shown
+		for (let i=(previous_page_number-1) * num_songs_per_page; i<previous_page_number * num_songs_per_page; i++) {
+			$("#song_box_" + (i)).attr("hidden", true)
+		}
+
+		// show songs based on page that was clicked
+		for (let i=(clicked_page_number-1) * num_songs_per_page; i<clicked_page_number * num_songs_per_page; i++) {
+			$("#song_box_" + (i)).attr("hidden", false)
+		}
+	}
+
+});
+</script>
 
 {% endblock content %}
+
+
