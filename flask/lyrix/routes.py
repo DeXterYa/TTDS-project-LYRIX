@@ -28,7 +28,10 @@ def home():
 	else:
 		songs = None
 
-	num_songs_retrieved = len(songs)
+	if songs:
+		num_songs_retrieved = len(songs)
+	else:
+		num_songs_retrieved = 0
 	# number of songs per page
 	songs_per_page = 5
 	num_pages = math.ceil(num_songs_retrieved / songs_per_page)
