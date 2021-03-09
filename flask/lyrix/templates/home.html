@@ -158,18 +158,30 @@
 
 		{% for i in range(0, num_songs_retrieved) %}
 			{% if i < songs_per_page%}
-			<div id="song_box_{{i}}" class="card mb-3" style="max-width: 800px;">
+			<div id="song_box_{{i}}" class="card border-light mb-3" style="max-width: 800px;">
 			{%else%}
-			<div id="song_box_{{i}}" class="card mb-3" hidden style="max-width: 800px;">
+			<div id="song_box_{{i}}" class="card border-light mb-3" hidden style="max-width: 800px;">
 			{%endif%}
 				<div class="row g-0">
-					<div class="col-md-4">
-					<img class="article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}" >
+					<div class="col-md-3">
+					<img class="article-img" src="{{ songs[i]['image_url'] }}" >
 					</div>
 					<div class="col-md-8">
 					<div class="card-body">
-						<h5 class="card-title">{{ songs[i]['title'] }}</h5>
-						<p class="card-text">Author: {{ songs[i]['author'][0] }}</p>
+						<h4 class="card-title" style="color:indigo">{{ songs[i]['title'] }}</h4>
+						<p class="card-text"><span class="badge bg-success">Artist</span> {{ songs[i]['author'][0] }}</p>
+						<p class="card-text"><span class="badge bg-info text-dark">Album</span>  {{ songs[i]['album'] }}</p>
+						
+						<p class="card-text">
+							<div class="row g-0">
+								<div class="col-md-4">
+									<span class="badge bg-warning text-dark">Genre</span>  {{ songs[i]['tags'][0] }}
+								</div>   
+								<div class="col-md-8">
+									<span class="badge bg-secondary">Release Date</span> {{ songs[i]['credits'].get('Release Date', [[""]])[0][0] }}
+								</div>
+							</div>
+						</p>
 						<!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
 						<a href="{{ url_for('lyrics', song_id=songs[i]['_id']) }}" class="stretched-link text-decoration-none"></a>
 					</div>
