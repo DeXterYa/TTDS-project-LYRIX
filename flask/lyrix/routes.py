@@ -22,16 +22,21 @@ def home():
 
 	start_time = time.time()
 
+	# initialize variables in case of no search
+	songs_per_page = 10
+	num_songs_retrieved = 0
+	num_pages = 0
+
 	# retrieve songs (a list data structure)
 	if lyrics:
 		songs = ranked_search(lyrics, preprocessor, songs_collection, index_collection, max_num_songs_retrieved)
+
+		# set number of pages based on number of retrieved songs
+		num_songs_retrieved = len(songs)
+		num_pages = math.ceil(num_songs_retrieved / songs_per_page)
 	else:
 		songs = None
 
-	num_songs_retrieved = len(songs)
-	# number of songs per page
-	songs_per_page = 5
-	num_pages = math.ceil(num_songs_retrieved / songs_per_page)
 
 	elapsed_time = time.time() - start_time
 
