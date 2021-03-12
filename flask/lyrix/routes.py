@@ -7,22 +7,26 @@ import time
 import math
 from itertools import groupby  
 
+is_search = False
+
 # different pages
 @app.route('/', methods=['GET', 'POST'])
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-	
+	global is_search
 	form = SearchBox()
 	if form.validate_on_submit():
+		is_search = True
 		return redirect(url_for('home', lyrics=form.lyrics.data, singer=form.singer.data,
-		 startdate=form.year_begin.data, enddate=form.year_end.data, is_search=True))
+		 startdate=form.year_begin.data, enddate=form.year_end.data))
 
 	# acquire these queries after searching to keep them in the search box
 	lyrics = request.args.get('lyrics', None)
 	singer = request.args.get('singer', None)
 	startdate = request.args.get('startdate', None)
 	enddate = request.args.get('enddate', None)
-	is_search = request.args.get('is_search', None)
+	
+	
 
 	is_advanced = False
 	advanced_dict = {}
@@ -61,7 +65,9 @@ def home():
 	elapsed_time = time.time() - start_time
 
 	# green flash message on top of the search box
-	flash(f'Results found {lyrics}! ({elapsed_time:.6f}s)', 'success')
+	if is_search:
+		flash(f'Results found {lyrics}! ({elapsed_time:.6f}s)', 'success')
+		is_search = False
 
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,
