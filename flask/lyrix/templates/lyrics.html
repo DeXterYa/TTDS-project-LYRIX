@@ -8,12 +8,25 @@
 	      <img class="article-img" src="{{ song.image_url }}" >
 	    </div>
 	    <div class="col-md-8">
+	      
 	      <div class="card-body">
-	        <h5 class="card-title">{{ song.title }}</h5>
-	        <p class="card-text">Author: {{ song.author[0] }}</p>
-	        <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-	        <a href="{{ url_for('lyrics', song_id=song.id) }}" class="stretched-link text-decoration-none"></a>
-	      </div>
+						<h4 class="card-title" style="color:indigo">{{ song['title'] }}</h4>
+						<p class="card-text"><span class="badge bg-success">Artist</span> {{ song['author'][0] }}</p>
+						<p class="card-text"><span class="badge bg-info text-dark">Album</span>  {{ song['album'] }}</p>
+						
+						<p class="card-text">
+							<div class="row g-0">
+								<div class="col-md-4">
+									<span class="badge bg-warning text-dark">Genre</span>  {{ song['tags'][0] }}
+								</div>   
+								<div class="col-md-8">
+									<span class="badge bg-secondary">Release Date</span> {{ song['credits'].get('Release Date', [[""]])[0][0] }}
+								</div>
+							</div>
+						</p>
+						<!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+						
+					</div>
 	    </div>
 	  </div>
 	</div>
