@@ -10,7 +10,7 @@ from unidecode import unidecode
 #   top_k        - number of songs that you want to output.
 # Output:
 #   songs - list of top_k song objects most relevant to the query.
-def ranked_search(query, preprocessor, songs_col, index_col, top_k):
+def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced, advaned_dict):
 
     # Remove nonenglish characters.
     query = unidecode(query)
@@ -43,15 +43,60 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k):
     # Sort the songs by the BM25 score with respect to the query in descending order. Then select
     # select just top_k best songs.
     idx     = list(np.argsort(list(scores.values())))[::-1]
-    results = list(np.array(list(scores.keys()))[idx])[:top_k]
     songs   = []
     relevance = []
 
-    for song_id in results:
 
-        # Query the songs collection in mongodb to load the actual song.
-        for song in songs_col.find({'_id': int(song_id)}):
-            songs += [song]
-            relevance += ["{:.2f}".format(scores[song_id])]
+    if (not is_advanced):
+        # if there is no advanced search content
+        results = list(np.array(list(scores.keys()))[idx])[:top_k]
+        
+        for song_id in results:
+
+            # Query the songs collection in mongodb to load the actual song.
+            for song in songs_col.find({'_id': int(song_id)}):
+                songs += [song]
+                relevance += ["{:.2f}".format(scores[song_id])]
+    else:
+        # if there is advanced search content
+        # we keep all results first
+        results = list(np.array(list(scores.keys()))[idx])
+        
+
+        singer = advaned_dict["singer"]
+        startdate = advaned_dict["startdate"]
+        enddate = advaned_dict["enddate"]
+
+        for song_id in results:        
+            for song in songs_col.find({'_id': int(song_id)}):
+
+                add_to_list = True
+
+                if singer is not None:
+                    # if the user specify the singer
+                    if singer.lower() not in song['author'][0].lower():
+                        add_to_list = False
+
+                if startdate or enddate:
+                    # if the user specify the startdate or enddate
+                    release_year = song['credits'].get('Release Date', [[""]])[0][0]
+
+                    if release_year != "":
+                        # release year field is not empty
+                        if startdate and (int(startdate) > int(release_year.rpartition(' ')[-1])):
+                            add_to_list = False
+
+                        if enddate and (int(enddate) < int(release_year.rpartition(' ')[-1])):
+                            add_to_list = False
+                    
+
+                if add_to_list:
+                    songs += [song]
+                    relevance += ["{:.2f}".format(scores[song_id])]
+
+            if len(songs) >= top_k:
+                break
+
+
     
     return songs, relevance
