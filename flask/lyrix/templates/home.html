@@ -162,11 +162,15 @@
 			{%else%}
 			<div id="song_box_{{i}}" class="card border-light mb-3" hidden style="max-width: 800px;">
 			{%endif%}
+			<div class="card-header header-color" style="background-color: #5f788a; color: #ffffff;">
+					Relevance: {{ relevance[i] }}
+			</div>
 				<div class="row g-0">
 					<div class="col-md-3">
 					<img class="article-img" src="{{ songs[i]['image_url'] }}" >
 					</div>
-					<div class="col-md-8">
+					<div class="col-md-7">
+
 					<div class="card-body">
 						<h4 class="card-title" style="color:indigo">{{ songs[i]['title'] }}</h4>
 						<p class="card-text"><span class="badge bg-success">Artist</span> {{ songs[i]['author'][0] }}</p>
@@ -185,7 +189,9 @@
 						<!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
 						<a href="{{ url_for('lyrics', song_id=songs[i]['_id']) }}" class="stretched-link text-decoration-none"></a>
 					</div>
+					
 					</div>
+
 				</div>
 			</div>
 

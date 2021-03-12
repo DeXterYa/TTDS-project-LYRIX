@@ -29,7 +29,7 @@ def home():
 
 	# retrieve songs (a list data structure)
 	if lyrics:
-		songs = ranked_search(lyrics, preprocessor, songs_collection, index_collection, max_num_songs_retrieved)
+		songs, relevance = ranked_search(lyrics, preprocessor, songs_collection, index_collection, max_num_songs_retrieved)
 
 		# set number of pages based on number of retrieved songs
 		num_songs_retrieved = len(songs)
@@ -49,7 +49,7 @@ def home():
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,
 	 						startdate=startdate, enddate=enddate, num_songs_retrieved=num_songs_retrieved, num_pages=num_pages,
-							 songs_per_page=songs_per_page)
+							 songs_per_page=songs_per_page, relevance=relevance)
 
 
 @app.route('/about') # the about page of the website

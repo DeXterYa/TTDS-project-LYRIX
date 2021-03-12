@@ -45,11 +45,13 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k):
     idx     = list(np.argsort(list(scores.values())))[::-1]
     results = list(np.array(list(scores.keys()))[idx])[:top_k]
     songs   = []
+    relevance = []
 
     for song_id in results:
 
         # Query the songs collection in mongodb to load the actual song.
         for song in songs_col.find({'_id': int(song_id)}):
             songs += [song]
+            relevance += ["{:.2f}".format(scores[song_id])]
     
-    return songs
+    return songs, relevance
