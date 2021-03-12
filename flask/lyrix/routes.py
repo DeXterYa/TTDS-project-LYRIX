@@ -84,6 +84,7 @@ def about():
 def lyrics():
 
 	song_id = request.args.get('song_id', None)
+	relevance = request.args.get('relevance', None)
 
 	if song_id:
 		song = songs_collection.find({'_id': int(song_id)})[0]
@@ -97,6 +98,6 @@ def lyrics():
 		token = "https://open.spotify.com/embed/track/" + track['external_urls']['spotify'].rsplit('/', 1)[-1]
 		img_url = track['album']['images'][0]['url']
 
-	return render_template('lyrics.html', song=song, token=token, img_url=img_url)
+	return render_template('lyrics.html', song=song, token=token, img_url=img_url, relevance=relevance)
 
 

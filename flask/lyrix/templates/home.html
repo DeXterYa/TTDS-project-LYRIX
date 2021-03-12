@@ -187,7 +187,7 @@
 							</div>
 						</p>
 						<!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-						<a href="{{ url_for('lyrics', song_id=songs[i]['_id']) }}" class="stretched-link text-decoration-none"></a>
+						<a href="{{ url_for('lyrics', song_id=songs[i]['_id'], relevance=relevance[i]) }}" class="stretched-link text-decoration-none"></a>
 					</div>
 					
 					</div>
