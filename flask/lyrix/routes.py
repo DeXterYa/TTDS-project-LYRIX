@@ -1,13 +1,11 @@
 from flask import render_template, url_for, flash, redirect, request
-from lyrix import app, sp, preprocessor, songs_collection, index_collection
+from lyrix import app, sp, preprocessor, songs_collection, index_collection, is_search
 from lyrix.query import ranked_search
 from lyrix.forms import SearchBox
-
 import time
 import math
 from itertools import groupby  
 
-is_search = False
 
 # different pages
 @app.route('/', methods=['GET', 'POST'])
@@ -66,7 +64,10 @@ def home():
 
 	# green flash message on top of the search box
 	if is_search:
-		flash(f'Results found {lyrics}! ({elapsed_time:.6f}s)', 'success')
+		if len(lyrics) <= 44:
+			flash(f'Results found "{lyrics}" ({elapsed_time:.6f}s)', 'success')
+		else:
+			flash(f'Results found "{lyrics[:44]}..." ({elapsed_time:.6f}s)', 'success')
 		is_search = False
 
 
