@@ -1,7 +1,8 @@
 from flask import render_template, url_for, flash, redirect, request
-from lyrix import app, sp, preprocessor, songs_collection, index_collection, is_search
+from lyrix import app, sp, preprocessor, songs_collection, index_collection, is_search, session
 from lyrix.query import ranked_search
 from lyrix.forms import SearchBox
+import flask
 import time
 import math
 from itertools import groupby  
@@ -15,6 +16,7 @@ def home():
 	form = SearchBox()
 	if form.validate_on_submit():
 		is_search = True
+		flask.session['is_search'] = True
 		return redirect(url_for('home', lyrics=form.lyrics.data, singer=form.singer.data,
 		 startdate=form.year_begin.data, enddate=form.year_end.data))
 
@@ -25,7 +27,6 @@ def home():
 	enddate = request.args.get('enddate', None)
 	
 	
-
 	is_advanced = False
 	advanced_dict = {}
 
@@ -48,6 +49,8 @@ def home():
 	num_pages = 0
 	relevance = []
 
+	
+
 	# retrieve songs (a list data structure)
 	if lyrics:
 		songs, relevance = ranked_search(lyrics, preprocessor, songs_collection,
@@ -63,12 +66,12 @@ def home():
 	elapsed_time = time.time() - start_time
 
 	# green flash message on top of the search box
-	if is_search:
+	if 'is_search' in flask.session and lyrics and flask.session['is_search']:
 		if len(lyrics) <= 44:
 			flash(f'Results found "{lyrics}" ({elapsed_time:.6f}s)', 'success')
 		else:
 			flash(f'Results found "{lyrics[:44]}..." ({elapsed_time:.6f}s)', 'success')
-		is_search = False
+		flask.session['is_search'] = False
 
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,

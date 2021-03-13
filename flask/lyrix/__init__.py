@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 import pymongo
 from lyrix.preprocessor import Preprocessor
 import spotipy
@@ -7,6 +8,9 @@ from spotipy.oauth2 import SpotifyClientCredentials
 app = Flask(__name__)
 # secret key for wtforms
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
+SESSION_TYPE = 'filesystem'
+app.config.from_object(__name__)
+Session(app)
 
 
 client           = pymongo.MongoClient("mongodb://localhost:27017/")
