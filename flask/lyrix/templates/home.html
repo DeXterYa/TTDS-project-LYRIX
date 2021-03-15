@@ -2,7 +2,7 @@
     
 {% extends "layout.html" %}
 {% block content %}
-	<form method="POST" action="" class="row g-3 align-items-center">
+	<form id="search_form" method="POST" action="" class="row g-3 align-items-center">
 		{{ form.hidden_tag() }} 
 		<!-- basic lyrics search -->
 		<div class="col-md-8">
@@ -34,17 +34,16 @@
 	 	<div class="col-md-4">
 	 		<!-- search button -->
 		 	<div class="form-group" >
-		 		{{ form.submit(class="btn btn-outline-info") }}		 		
+		 		{{ form.submit(class="btn btn-primary") }}		 		
 		 	</div>
 	 	</div>
 
 	 	<!-- advanced search -->
-	 	<div class="col-md-10">
+	 	<div class="col-md-12">
 		 	<div class="accordion accordion-flush" id="accordionExample">
 		 		<div class="accordion-item">
 		 			<!-- header -->
 		 			<h2 class="accordion-header" id="headingOne">
-
 		 				{% if singer or startdate or enddate %}
 			 				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
 						    	Advanced Search
@@ -54,8 +53,6 @@
 						    	Advanced Search
 						    </button>
 					    {% endif %}
-
-
 		 			</h2>
 		 			<!-- body -->
 		 			{% if singer or startdate or enddate %}
@@ -99,9 +96,9 @@
 						        	<div class="form-group">
 						        		<div class="form-floating">
 						        			{% if startdate %}
-						        				{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear", value=startdate) }}
+						        				{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear", type="number", value=startdate) }}
 						        			{% else %}
-						        				{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear") }}
+						        				{{ form.year_begin(class="form-control", id="fromYear", placeholder="fromYear", type="number") }}
 						        			{% endif %}
 						        			
 						        			<label for="fromYear">From year</label>
@@ -113,15 +110,16 @@
 						        	<div class="form-group">
 						        		<div class="form-floating">
 						        			{% if enddate %}
-						        				{{ form.year_end(class="form-control", id="toYear", placeholder="toYear", value=enddate) }}
+						        				{{ form.year_end(class="form-control", id="toYear", placeholder="toYear", type="number", value=enddate) }}
 						        			{% else %}
-						        				{{ form.year_end(class="form-control", id="toYear", placeholder="toYear") }}
+						        				{{ form.year_end(class="form-control", id="toYear", placeholder="toYear", type="number") }}
 						        			{% endif %}
 						        			
 						        			<label for="toYear">To year</label>
 						        		</div>
 						        	</div>
 					        	</div>	
+								<span id="year_range_error_message" hidden>Invalid year range</span>
 				        	</div>
 				        	
 				    	</div>
@@ -189,7 +187,7 @@
 						<!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
 						<a href="{{ url_for('lyrics', song_id=songs[i]['_id'], relevance=relevance[i]) }}" class="stretched-link text-decoration-none"></a>
 					</div>
-					
+				
 					</div>
 
 				</div>
@@ -208,6 +206,7 @@
 			-->
 		{% endfor %}
     {% endif %}
+
 
 <script>
 $( document ).ready(function() {
@@ -236,8 +235,32 @@ $( document ).ready(function() {
 		}
 	}
 
+	$("#toYear").focusout(function() {
+		validate_year_range()
+	})
+	$("#fromYear").focusout(function() {
+		validate_year_range()
+	})
+
+	function validate_year_range() 
+	{
+		let fromYear = $("#fromYear").val()		
+		let toYear   = $("#toYear").val()		
+		
+		fromYear = parseInt(fromYear)
+		toYear   = parseInt(toYear)
+		
+		if (fromYear > toYear) {
+			$("#submit").addClass("disabled")
+			$("#year_range_error_message").attr('hidden', false)
+		}
+		else {
+			$("#submit").removeClass("disabled")
+			$("#year_range_error_message").attr('hidden', true)	
+		}
+	}
 });
-</script>
+</script> 
 
 {% endblock content %}
 

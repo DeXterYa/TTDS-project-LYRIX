@@ -87,3 +87,13 @@ a.custom-card,
 a.custom-card:hover {
   color:inherit;
 }
+
+#year_range_error_message {
+  color: red;
+  margin-left: 70px;
+  font-weight: 600;
+}
+
+#collapseOne{
+  border-bottom: none;
+}

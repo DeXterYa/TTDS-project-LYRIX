@@ -54,7 +54,7 @@ def home():
 	# retrieve songs (a list data structure)
 	if lyrics:
 		songs, relevance = ranked_search(lyrics, preprocessor, songs_collection,
-		 index_collection, max_num_songs_retrieved, is_advanced, advanced_dict)
+		  index_collection, max_num_songs_retrieved, is_advanced, advanced_dict)
 
 		# set number of pages based on number of retrieved songs
 		num_songs_retrieved = len(songs)
@@ -67,7 +67,10 @@ def home():
 
 	# green flash message on top of the search box
 	if 'is_search' in flask.session and lyrics and flask.session['is_search']:
-		if len(lyrics) <= 44:
+		# no songs retireved
+		if num_songs_retrieved == 0:
+			flash(f'No results found ({elapsed_time:.6f}s)', 'danger')
+		elif len(lyrics) <= 44:
 			flash(f'Results found "{lyrics}" ({elapsed_time:.6f}s)', 'success')
 		else:
 			flash(f'Results found "{lyrics[:44]}..." ({elapsed_time:.6f}s)', 'success')
