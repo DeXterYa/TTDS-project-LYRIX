@@ -111,8 +111,8 @@ class Preprocessor:
             elif of_type == 'query':
 
                 # Stem word with every available stemmer.
-                for stemmer in self.stemmers.values():
-                    expand += [stemmer.stem(word)]
+                # for stemmer in self.stemmers.values():
+                expand += [self.stemmers[lang].stem(word)]
 
         if of_type == 'query':
 
