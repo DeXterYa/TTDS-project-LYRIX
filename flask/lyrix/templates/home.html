@@ -2,11 +2,13 @@
     
 {% extends "layout.html" %}
 {% block content %}
-	<form id="search_form" method="POST" action="" class="row g-3 align-items-center">
+	<form id="search_form" method="POST" action="" class="row g-3 align-items-center" onsubmit="addSpinner()">
 		{{ form.hidden_tag() }} 
 		<!-- basic lyrics search -->
 		<div class="col-md-8">
 	 		<div class="form-group">
+	 			<div class="input-group">
+	 				<div class="col-md-9">
 	 			<div class="form-floating">
 	 				<!-- lyrics search box with a validation check -->
 		 			{% if form.lyrics.errors %}
@@ -29,13 +31,20 @@
 
 	 			</div>
 	 		</div>
+	 			{{ form.language(**attrs) }}
+	 		</div>
+	 		</div>
 		</div>
 
 	 	<div class="col-md-4">
 	 		<!-- search button -->
 		 	<div class="form-group" >
-		 		{{ form.submit(class="btn btn-primary") }}		 		
+		 		{{ form.submit(class="btn btn-primary", style="margin: 5px") }}	
+		 		<div id="spinner" class="spinner-border spinner-border-sm" role="status" style="display: none">
+			  <span class="visually-hidden">Loading...</span>
+			</div>	 		
 		 	</div>
+
 	 	</div>
 
 	 	<!-- advanced search -->
@@ -209,7 +218,27 @@
 
 
 <script>
+function addSpinner() {
+  var x = document.getElementById("spinner");
+  
+  if (x.style.display === "none") {
+    x.style.display = "";
+  } else {
+    x.style.display = "none";
+  }
+}
+
 $( document ).ready(function() {
+
+    // $("#searchbutton").click(function() {
+    //   // add spinner to button
+    //   $(this).html(
+    //     `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+    //   );
+      
+    // });
+
+
 	$(".page-link").on("click", function() {
 		// disactivate the previous page and activate the clicked page
 		let previous_page_number = $("li.active").text(),

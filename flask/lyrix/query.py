@@ -10,13 +10,13 @@ from unidecode import unidecode
 #   top_k        - number of songs that you want to output.
 # Output:
 #   songs - list of top_k song objects most relevant to the query.
-def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced, advaned_dict):
+def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced, advaned_dict, lang='en'):
 
     # Remove nonenglish characters.
     query = unidecode(query)
 
     # Preprocess the query with all stemmers available in NLTK.
-    query  = preprocessor.preprocess(query, of_type='query')
+    query  = preprocessor.preprocess(query, of_type='query', lang='en')
     query  = query.split()
     scores = dict()
     

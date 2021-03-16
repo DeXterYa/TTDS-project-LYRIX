@@ -18,13 +18,15 @@ def home():
 		is_search = True
 		flask.session['is_search'] = True
 		return redirect(url_for('home', lyrics=form.lyrics.data, singer=form.singer.data,
-		 startdate=form.year_begin.data, enddate=form.year_end.data))
+		 startdate=form.year_begin.data, enddate=form.year_end.data, language=form.language.data))
 
 	# acquire these queries after searching to keep them in the search box
 	lyrics = request.args.get('lyrics', None)
 	singer = request.args.get('singer', None)
 	startdate = request.args.get('startdate', None)
 	enddate = request.args.get('enddate', None)
+	language = request.args.get('language', None)
+	attrs = {'class': "btn btn-outline-secondary dropdown-toggle", 'data-bs-toggle': "dropdown", 'aria-expanded': "false"}
 	
 	
 	is_advanced = False
@@ -50,11 +52,12 @@ def home():
 	relevance = []
 
 	
-
 	# retrieve songs (a list data structure)
 	if lyrics:
+		form.language.default = language
+		form.process()
 		songs, relevance = ranked_search(lyrics, preprocessor, songs_collection,
-		  index_collection, max_num_songs_retrieved, is_advanced, advanced_dict)
+		  index_collection, max_num_songs_retrieved, is_advanced, advanced_dict, language)
 
 		# set number of pages based on number of retrieved songs
 		num_songs_retrieved = len(songs)
@@ -79,7 +82,7 @@ def home():
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,
 	 						startdate=startdate, enddate=enddate, num_songs_retrieved=num_songs_retrieved, num_pages=num_pages,
-							 songs_per_page=songs_per_page, relevance=relevance)
+							 songs_per_page=songs_per_page, relevance=relevance, attrs=attrs)
 
 
 @app.route('/about') # the about page of the website
