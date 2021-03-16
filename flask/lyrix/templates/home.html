@@ -2,7 +2,7 @@
     
 {% extends "layout.html" %}
 {% block content %}
-	<form id="search_form" method="POST" action="" class="row g-3 align-items-center" onsubmit="addSpinner()">
+	<form id="search_form" method="POST" action="" class="form-horizontal row g-3 align-items-center" onsubmit="addSpinner()">
 		{{ form.hidden_tag() }} 
 		<!-- basic lyrics search -->
 		<div class="col-md-8">
@@ -229,16 +229,6 @@ function addSpinner() {
 }
 
 $( document ).ready(function() {
-
-    // $("#searchbutton").click(function() {
-    //   // add spinner to button
-    //   $(this).html(
-    //     `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
-    //   );
-      
-    // });
-
-
 	$(".page-link").on("click", function() {
 		// disactivate the previous page and activate the clicked page
 		let previous_page_number = $("li.active").text(),
