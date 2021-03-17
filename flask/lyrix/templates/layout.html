@@ -70,8 +70,33 @@
 	                <a href="{{ url_for('lyrics', song_id=song[1], relevance=song[2]) }}" class="list-group-item list-group-item-light">{{ song[0] }}</a>
 	                {% endfor %}
 	              </ul>
-	           </p>
+	           
 	          </div>
+	          
+	          {% if onHomePage and songs %}
+	          <nav id="navbar-example3" class="navbar navbar-light bg-light sticky-top" style="top: 450px">
+			  
+			  <nav class="nav nav-pills flex-column">
+			  	{% for i in range(0, num_songs_retrieved) %}
+			  	{% if i < songs_per_page %}
+			  	<li id="nav_{{i}}" class="nav-item">
+			  	<a class="nav-link" href="#song_box_{{i}}">{{ songs[i]['title'] }}</a>
+				</li>
+				{% else %}
+				<li id="nav_{{i}}"  hidden class="nav-item">
+			  	<a class="nav-link" href="#song_box_{{i}}">{{ songs[i]['title'] }}</a>
+				</li>
+			
+				{% endif %}
+			    {% endfor %}
+			    
+			    </nav>
+			  </nav>
+			  {% endif %}
+			
+			  
+
+
 	    </div>
 		
       </div>

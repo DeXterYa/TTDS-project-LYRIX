@@ -2,11 +2,11 @@
     
 {% extends "layout.html" %}
 {% block content %}
-<div class="sticky-top" style="top: 65px; background-color: #fafafa">
+<div class="sticky-top" style="top: 55px; background-color: #fafafa">
 	<form id="search_form" method="POST" action="" class="form-horizontal row g-3 align-items-center" onsubmit="addSpinner()">
 		{{ form.hidden_tag() }} 
 		<!-- basic lyrics search -->
-		<div class="col-md-8">
+		<div class="col-md-10">
 	 		<div class="form-group">
 	 			<div class="input-group">
 	 				<div class="col-md-9">
@@ -37,7 +37,7 @@
 	 		</div>
 		</div>
 
-	 	<div class="col-md-4">
+	 	<div class="col-md-2" align="left">
 	 		<!-- search button -->
 		 	<div class="form-group" >
 		 		{{ form.submit(class="btn btn-primary", style="margin: 5px") }}	
@@ -49,7 +49,7 @@
 	 	</div>
 
 	 	<!-- advanced search -->
-	 	<div class="col-md-12">
+	 	<div class="col-md-10">
 		 	<div class="accordion accordion-flush" id="accordionExample">
 		 		<div class="accordion-item">
 		 			<!-- header -->
@@ -141,7 +141,7 @@
 		 	</div>	
 	 	</div>
 	 	
-		<hr>
+		<hr style="width: 80%">
 
 	 		 
 	</form>
@@ -150,7 +150,7 @@
 		<span id="songs_per_page" hidden>{{songs_per_page}}</span>
 
 		{% if num_pages > 1 %}
-		<nav aria-label="Page navigation example">
+		<nav aria-label="Page navigation example" style="padding-bottom: 5px">
 			<ul class="pagination">
 				{%for i in range(0, num_pages)%} 
 					<!-- make the first page active -->
@@ -163,8 +163,13 @@
 			</ul>
 		</nav>
 		{% endif %}
-	</div>
+		</div>
+		{% else %}
+			</div>
 
+    {% endif %}
+	
+		<div data-bs-spy="scroll" data-bs-target="#navbar-example3" data-bs-offset="20" tabindex="0">
 		{% for i in range(0, num_songs_retrieved) %}
 			{% if i < songs_per_page%}
 			<div id="song_box_{{i}}" class="card border-light mb-3" style="max-width: 800px;">
@@ -216,7 +221,8 @@
 				</article> 
 			-->
 		{% endfor %}
-    {% endif %}
+	</div>
+	
 
 
 <script>
@@ -229,6 +235,8 @@ function addSpinner() {
     x.style.display = "none";
   }
 }
+
+
 
 $( document ).ready(function() {
 	$(".page-link").on("click", function() {
@@ -248,11 +256,13 @@ $( document ).ready(function() {
 		// hide songs that were previously shown
 		for (let i=(previous_page_number-1) * num_songs_per_page; i<previous_page_number * num_songs_per_page; i++) {
 			$("#song_box_" + (i)).attr("hidden", true)
+			$("#nav_" + (i)).attr("hidden", true)
 		}
 
 		// show songs based on page that was clicked
 		for (let i=(clicked_page_number-1) * num_songs_per_page; i<clicked_page_number * num_songs_per_page; i++) {
 			$("#song_box_" + (i)).attr("hidden", false)
+			$("#nav_" + (i)).attr("hidden", false)
 		}
 	}
 

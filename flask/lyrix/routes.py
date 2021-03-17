@@ -85,14 +85,16 @@ def home():
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,
 	 						startdate=startdate, enddate=enddate, num_songs_retrieved=num_songs_retrieved, num_pages=num_pages,
-							 songs_per_page=songs_per_page, relevance=relevance, attrs=attrs, history=flask.session['history'])
+							 songs_per_page=songs_per_page, relevance=relevance, attrs=attrs, history=flask.session['history'],
+							 onHomePage=True)
 
 
 @app.route('/about') # the about page of the website
 def about():
 	if 'history' not in flask.session:
 			flask.session['history'] = [[]]
-	return render_template('about.html', title='About', history=flask.session['history'])
+	return render_template('about.html', title='About', 
+		history=flask.session['history'], onHomePage=False)
 
 
 @app.route('/lyrics', methods=['GET', 'POST']) 
@@ -109,7 +111,7 @@ def lyrics():
 			flask.session['history'] = [[song_id, song.title, relevance]]
 		else:
 			if len(flask.session['history']) >= 1:
-				if flask.session['history'][0][1] != song_id:
+				if len(flask.session['history'][0]) == 3 and flask.session['history'][0][1] != song_id:
 					flask.session['history'].insert(0, [song['title'], song_id, relevance])
 					if len(flask.session['history']) > 5:
 						flask.session['history'].pop()
@@ -125,6 +127,7 @@ def lyrics():
 		token = "https://open.spotify.com/embed/track/" + track['external_urls']['spotify'].rsplit('/', 1)[-1]
 		img_url = track['album']['images'][0]['url']
 
-	return render_template('lyrics.html', song=song, token=token, img_url=img_url, relevance=relevance, history=flask.session['history'])
+	return render_template('lyrics.html', song=song, token=token, 
+		img_url=img_url, relevance=relevance, history=flask.session['history'], onHomePage=False)
 
 
