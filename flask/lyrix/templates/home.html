@@ -2,7 +2,7 @@
     
 {% extends "layout.html" %}
 {% block content %}
-<div class="sticky-top" style="top: 55px; background-color: #fafafa">
+<div id="song_box_-1">
 	<form id="search_form" method="POST" action="" class="form-horizontal row g-3 align-items-center" onsubmit="addSpinner()">
 		{{ form.hidden_tag() }} 
 		<!-- basic lyrics search -->
@@ -150,7 +150,7 @@
 		<span id="songs_per_page" hidden>{{songs_per_page}}</span>
 
 		{% if num_pages > 1 %}
-		<nav aria-label="Page navigation example" style="padding-bottom: 5px">
+		<nav id="song_box_-1" aria-label="Page navigation example" style="padding-bottom: 5px">
 			<ul class="pagination">
 				{%for i in range(0, num_pages)%} 
 					<!-- make the first page active -->
@@ -169,7 +169,7 @@
 
     {% endif %}
 	
-		<div data-bs-spy="scroll" data-bs-target="#navbar-example3" data-bs-offset="20" tabindex="0">
+		<div style="padding-bottom: 500px">
 		{% for i in range(0, num_songs_retrieved) %}
 			{% if i < songs_per_page%}
 			<div id="song_box_{{i}}" class="card border-light mb-3" style="max-width: 800px;">
@@ -226,6 +226,7 @@
 
 
 <script>
+
 function addSpinner() {
   var x = document.getElementById("spinner");
   
@@ -239,6 +240,7 @@ function addSpinner() {
 
 
 $( document ).ready(function() {
+	
 	$(".page-link").on("click", function() {
 		// disactivate the previous page and activate the clicked page
 		let previous_page_number = $("li.active").text(),
@@ -247,11 +249,13 @@ $( document ).ready(function() {
 		$("#page_" + clicked_page_number).addClass("active")
 
 		toggle_songs(previous_page_number, clicked_page_number)
+		
 	});
 
 	// toggle songs that are displayed
 	function toggle_songs(previous_page_number, clicked_page_number) {
 		let num_songs_per_page = $("#songs_per_page").text()
+		$('#song_box_-'+previous_page_number.toString()).attr('id', 'song_box_-'+clicked_page_number.toString())
 		
 		// hide songs that were previously shown
 		for (let i=(previous_page_number-1) * num_songs_per_page; i<previous_page_number * num_songs_per_page; i++) {
@@ -264,6 +268,8 @@ $( document ).ready(function() {
 			$("#song_box_" + (i)).attr("hidden", false)
 			$("#nav_" + (i)).attr("hidden", false)
 		}
+
+
 	}
 
 	$("#toYear").focusout(function() {
@@ -291,6 +297,8 @@ $( document ).ready(function() {
 		}
 	}
 });
+
+		
 </script> 
 
 {% endblock content %}
