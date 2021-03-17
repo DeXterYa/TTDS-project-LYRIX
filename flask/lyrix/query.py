@@ -16,7 +16,7 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced,
     query = unidecode(query)
 
     # Preprocess the query with all stemmers available in NLTK.
-    query  = preprocessor.preprocess(query, of_type='query', lang='en')
+    query  = preprocessor.preprocess(query, of_type='query', lang=lang)
     query  = query.split()
     scores = dict()
     
