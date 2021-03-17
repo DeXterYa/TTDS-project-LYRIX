@@ -2,6 +2,7 @@
     
 {% extends "layout.html" %}
 {% block content %}
+<div class="sticky-top" style="top: 65px; background-color: #fafafa">
 	<form id="search_form" method="POST" action="" class="form-horizontal row g-3 align-items-center" onsubmit="addSpinner()">
 		{{ form.hidden_tag() }} 
 		<!-- basic lyrics search -->
@@ -162,6 +163,7 @@
 			</ul>
 		</nav>
 		{% endif %}
+	</div>
 
 		{% for i in range(0, num_songs_retrieved) %}
 			{% if i < songs_per_page%}

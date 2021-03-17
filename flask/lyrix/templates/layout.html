@@ -60,20 +60,20 @@
           {% block content %}{% endblock %}
         </div>
         <!-- side bar -->
-		<!--
+		
 	    <div class="col-md-4">
-	          <div class="content-section">
-	            <h3>Our Sidebar</h3>
-	            <p class='text-muted'>You can put any information here you'd like.
+	          <div class="content-section sticky-top" style="top: 60px">
+	            <h3>Song History</h3>
+	            
 	              <ul class="list-group">
-	                <li class="list-group-item list-group-item-light">Singers</li>
-	                <li class="list-group-item list-group-item-light">Genres</li>	          
-	                <li class="list-group-item list-group-item-light">etc</li>
+	              	{% for song in history %}
+	                <a href="{{ url_for('lyrics', song_id=song[1], relevance=song[2]) }}" class="list-group-item list-group-item-light">{{ song[0] }}</a>
+	                {% endfor %}
 	              </ul>
-	            </p>
+	           </p>
 	          </div>
 	    </div>
-		-->
+		
       </div>
     </main>
 	
