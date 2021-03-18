@@ -80,7 +80,7 @@ def home():
 		flask.session['is_search'] = False
 
 	if 'history' not in flask.session:
-			flask.session['history'] = [[]]
+			flask.session['history'] = []
 
 
 	return render_template('home.html', form=form, songs=songs, lyrics=lyrics, singer=singer,
@@ -92,7 +92,7 @@ def home():
 @app.route('/about') # the about page of the website
 def about():
 	if 'history' not in flask.session:
-			flask.session['history'] = [[]]
+			flask.session['history'] = []
 	return render_template('about.html', title='About', 
 		history=flask.session['history'], onHomePage=False)
 
@@ -109,15 +109,17 @@ def lyrics():
 
 		# record the song history of the user
 		if 'history' not in flask.session:
-			flask.session['history'] = [[song.title, song_id, relevance]]
+			flask.session['history'] = [[song['title'], song_id, relevance]]
 		else:
 			if len(flask.session['history']) == 0:
-				flask.session['history'].insert(0, [song['title'], song_id, relevance])
+				print("hello")
+				flask.session['history'].append([song['title'], song_id, relevance])
 			elif len(flask.session['history']) >= 1:
 				if len(flask.session['history'][0]) == 3 and flask.session['history'][0][1] != song_id:
 					flask.session['history'].insert(0, [song['title'], song_id, relevance])
 					if len(flask.session['history']) > 5:
 						flask.session['history'].pop()
+			print(flask.session['history'])
 	else:
 		song = None
 
