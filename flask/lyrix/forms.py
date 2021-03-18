@@ -5,9 +5,6 @@ from wtforms.validators import DataRequired
 # search box for the home page including the advanced search
 class SearchBox(FlaskForm):
 
-	
-	
-	
 	choices = [('da', 'Danish'),
                     ('nl', 'Dutch'), 
                     ('en', 'English'),
@@ -21,6 +18,7 @@ class SearchBox(FlaskForm):
                     ('ro', 'Romanian'),
                     ('es', 'Spanish'),
                     ('sv', 'Swedish')]
+                    
 	lyrics = StringField('Search Lyrics', validators=[DataRequired()])
 	language = SelectField('Language', choices=choices, default='en')
 	singer = StringField('Singer')

@@ -208,18 +208,6 @@
 
 				</div>
 			</div>
-
-			<!--    
-				<article class="media content-section">
-					<img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/dexter.jpg') }}">
-					<div class="media-body">
-					<div class="article-metadata">
-						<a class="mr-2" href="#">{{ songs[i].author[0] }}</a>
-						<small class="text-muted">{{ songs[i].title }}</small>
-					</div>
-					</div>
-				</article> 
-			-->
 		{% endfor %}
 	</div>
 	
@@ -228,6 +216,7 @@
 <script>
 
 function addSpinner() {
+
   var x = document.getElementById("spinner");
   
   if (x.style.display === "none") {
@@ -236,8 +225,6 @@ function addSpinner() {
     x.style.display = "none";
   }
 }
-
-
 
 $( document ).ready(function() {
 	
@@ -298,7 +285,6 @@ $( document ).ready(function() {
 	}
 });
 
-		
 </script> 
 
 {% endblock content %}

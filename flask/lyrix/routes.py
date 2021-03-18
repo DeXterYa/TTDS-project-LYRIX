@@ -105,18 +105,19 @@ def lyrics():
 
 	if song_id:
 
-
 		song = songs_collection.find({'_id': int(song_id)})[0]
+
+		# record the song history of the user
 		if 'history' not in flask.session:
 			flask.session['history'] = [[song_id, song.title, relevance]]
 		else:
-			if len(flask.session['history']) >= 1:
+			if len(flask.session['history']) == 0:
+				flask.session['history'].insert(0, [song['title'], song_id, relevance])
+			elif len(flask.session['history']) >= 1:
 				if len(flask.session['history'][0]) == 3 and flask.session['history'][0][1] != song_id:
 					flask.session['history'].insert(0, [song['title'], song_id, relevance])
 					if len(flask.session['history']) > 5:
 						flask.session['history'].pop()
-
-
 	else:
 		song = None
 
