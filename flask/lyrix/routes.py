@@ -109,7 +109,7 @@ def lyrics():
 
 		# record the song history of the user
 		if 'history' not in flask.session:
-			flask.session['history'] = [[song_id, song.title, relevance]]
+			flask.session['history'] = [[song.title, song_id, relevance]]
 		else:
 			if len(flask.session['history']) == 0:
 				flask.session['history'].insert(0, [song['title'], song_id, relevance])
