@@ -56,7 +56,7 @@ def home():
 	if lyrics:
 		form.language.default = language
 		form.process()
-		songs, relevance = ranked_search(lyrics, preprocessor, songs_collection,
+		songs, relevance, total_count = ranked_search(lyrics, preprocessor, songs_collection,
 		  index_collection, max_num_songs_retrieved, is_advanced, advanced_dict, language)
 
 		# set number of pages based on number of retrieved songs
@@ -73,10 +73,10 @@ def home():
 		# no songs retireved
 		if num_songs_retrieved == 0:
 			flash(f'No results found ({elapsed_time:.6f}s)', 'danger')
-		elif len(lyrics) <= 44:
-			flash(f'Results found "{lyrics}" ({elapsed_time:.6f}s)', 'success')
+		elif len(lyrics) <= 30:
+			flash(f'{total_count} results found "{lyrics}" ({elapsed_time:.6f}s)', 'success')
 		else:
-			flash(f'Results found "{lyrics[:44]}..." ({elapsed_time:.6f}s)', 'success')
+			flash(f'{total_count} results found "{lyrics[:30]}..." ({elapsed_time:.6f}s)', 'success')
 		flask.session['is_search'] = False
 
 	if 'history' not in flask.session:
@@ -112,7 +112,6 @@ def lyrics():
 			flask.session['history'] = [[song['title'], song_id, relevance]]
 		else:
 			if len(flask.session['history']) == 0:
-				print("hello")
 				flask.session['history'].append([song['title'], song_id, relevance])
 			elif len(flask.session['history']) >= 1:
 				if len(flask.session['history'][0]) == 3 and flask.session['history'][0][1] != song_id:

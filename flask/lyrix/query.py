@@ -45,6 +45,7 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced,
     idx     = list(np.argsort(list(scores.values())))[::-1]
     songs   = []
     relevance = []
+    total_count = len(idx)
 
 
     if (not is_advanced):
@@ -74,7 +75,8 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced,
 
                 if singer is not None:
                     # if the user specify the singer
-                    if singer.lower() not in song['author'][0].lower():
+                    # if singer.lower() not in song['author'][0].lower():
+                    if singer.lower() not in song['author'][0].lower().split():
                         add_to_list = False
 
                 if startdate or enddate:
@@ -99,4 +101,4 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced,
 
 
     
-    return songs, relevance
+    return songs, relevance, total_count
