@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request
-from lyrix import app, sp, preprocessor, songs_collection, index_collection, is_search, session
+from lyrix import app, sp, preprocessor, songs_collection, index_collection, is_search, session, artist_collection
 from lyrix.query import ranked_search
 from lyrix.forms import SearchBox
 import flask
@@ -57,7 +57,7 @@ def home():
 		form.language.default = language
 		form.process()
 		songs, relevance, total_count = ranked_search(lyrics, preprocessor, songs_collection,
-		  index_collection, max_num_songs_retrieved, is_advanced, advanced_dict, language)
+		  index_collection, artist_collection, max_num_songs_retrieved, is_advanced, advanced_dict, language)
 
 		# set number of pages based on number of retrieved songs
 		num_songs_retrieved = len(songs)

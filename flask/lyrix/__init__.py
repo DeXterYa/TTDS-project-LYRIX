@@ -17,6 +17,7 @@ client           = pymongo.MongoClient("mongodb://localhost:27017/")
 database         = client["lyrix"]
 songs_collection = database["songs"]
 index_collection = database["song_index"]
+artist_collection = database["artist_index"]
 preprocessor = Preprocessor()
 
 is_search = False

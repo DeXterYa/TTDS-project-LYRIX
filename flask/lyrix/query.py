@@ -1,5 +1,5 @@
 import numpy as np
-
+import string
 from unidecode import unidecode
 
 # Inputs:
@@ -10,7 +10,7 @@ from unidecode import unidecode
 #   top_k        - number of songs that you want to output.
 # Output:
 #   songs - list of top_k song objects most relevant to the query.
-def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced, advaned_dict, lang='en'):
+def ranked_search(query, preprocessor, songs_col, index_col, artist_col, top_k, is_advanced, advaned_dict, lang='en'):
 
     # Remove nonenglish characters.
     query = unidecode(query)
@@ -62,22 +62,25 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced,
         # if there is advanced search content
         # we keep all results first
         results = list(np.array(list(scores.keys()))[idx])
-        
 
         singer = advaned_dict["singer"]
+
+        if singer is not None:
+            translator = str.maketrans(string.punctuation, ' '*len(string.punctuation))
+            name_list = singer.lower().translate(translator).split()
+            song_ids_with_artist = set()
+            for record in artist_col.find({"_id": {"$in":name_list}}):
+                song_ids_with_artist = song_ids_with_artist.union(set(record['indexes']))
+
+            results = [result for result in results if result in song_ids_with_artist]
+
+
+        
         startdate = advaned_dict["startdate"]
         enddate = advaned_dict["enddate"]
 
         for song_id in results:        
             for song in songs_col.find({'_id': int(song_id)}):
-
-                add_to_list = True
-
-                if singer is not None:
-                    # if the user specify the singer
-                    # if singer.lower() not in song['author'][0].lower():
-                    if singer.lower() not in song['author'][0].lower().split():
-                        add_to_list = False
 
                 if startdate or enddate:
                     # if the user specify the startdate or enddate
@@ -86,15 +89,15 @@ def ranked_search(query, preprocessor, songs_col, index_col, top_k, is_advanced,
                     if release_year != "":
                         # release year field is not empty
                         if startdate and (int(startdate) > int(release_year.rpartition(' ')[-1])):
-                            add_to_list = False
+                            continue
 
                         if enddate and (int(enddate) < int(release_year.rpartition(' ')[-1])):
-                            add_to_list = False
+                            continue
                     
 
-                if add_to_list:
-                    songs += [song]
-                    relevance += ["{:.2f}".format(scores[song_id])]
+                
+                songs += [song]
+                relevance += ["{:.2f}".format(scores[song_id])]
 
             if len(songs) >= top_k:
                 break
