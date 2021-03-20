@@ -149,17 +149,50 @@
 	{% if lyrics or singer or startdate or enddate %}
 		<span id="songs_per_page" hidden>{{songs_per_page}}</span>
 
-		{% if num_pages > 1 %}
+		{% if total_pages > 1 %}
 		<nav id="song_box_-1" aria-label="Page navigation example" style="padding-bottom: 5px">
 			<ul class="pagination">
-				{%for i in range(0, num_pages)%} 
+				<!-- left arrow -->
+				{% if page_num == 1 %}
+				<li class="page-item disabled">
+			      <a class="page-link" href="#" aria-label="Previous" aria-disabled="true">
+			        <span aria-hidden="true">&laquo;</span>
+			      </a>
+			    </li>
+			    {% else %}
+			    <li class="page-item">
+			      <a class="page-link" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page_num=page_num - 1, total_pages=total_pages) }}" aria-label="Previous">
+			        <span aria-hidden="true">&laquo;</span>
+			      </a>
+			    </li>
+			    {% endif %}
+
+			    <!-- page indexes -->
+				{% for page_index in page_list %} 
 					<!-- make the first page active -->
-					{% if i == 0 %}
-						<li id="page_{{i+1}}" class="page-item active"><a id="page_button_{{i+1}}" class="page-link" href="#">{{i+1}}</a></li>
-					{%else%}
-						<li id="page_{{i+1}}" class="page-item"><a id="page_button_{{i+1}}" class="page-link" href="#">{{i+1}}</a></li>
-					{%endif%}
-				{%endfor%}
+					{% if page_index == page_num %}
+						<li  class="page-item active"><a class="page-link" href="#">{{page_index}}</a></li>
+					{% else %}
+						<li  class="page-item"><a class="page-link" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page_num=page_index, total_pages=total_pages) }}">{{page_index}}</a></li>
+					{% endif %}
+				{% endfor %}
+
+				<!-- right arrow -->
+				{% if page_num == total_pages %}
+				<li class="page-item disabled">
+			      <a class="page-link" href="#" aria-label="Previous" aria-disabled="true">
+			        <span aria-hidden="true">&raquo;</span>
+			      </a>
+			    </li>
+			    {% else %}
+			    <li class="page-item">
+			      <a class="page-link" href="{{ url_for('home', lyrics=lyrics, singer=singer, startdate=startdate, enddate=enddate, page_num=page_num + 1, total_pages=total_pages) }}" aria-label="Previous">
+			        <span aria-hidden="true">&raquo;</span>
+			      </a>
+			    </li>
+			    {% endif %}
+			  
+
 			</ul>
 		</nav>
 		{% endif %}
@@ -169,16 +202,14 @@
 
     {% endif %}
 	
+
+    	{% if songs %}
 		<div style="padding-bottom: 500px">
-		{% for i in range(0, num_songs_retrieved) %}
-			{% if i < songs_per_page%}
+			{% for i in range(songs|length) %}
 			<div id="song_box_{{i}}" class="card border-light mb-3" style="max-width: 800px;">
-			{%else%}
-			<div id="song_box_{{i}}" class="card border-light mb-3" hidden style="max-width: 800px;">
-			{%endif%}
-			<div class="card-header header-color" style="background-color: #5f788a; color: #ffffff;">
+				<div class="card-header header-color" style="background-color: #5f788a; color: #ffffff;">
 					Relevance: {{ relevance[i] }}
-			</div>
+				</div>
 				<div class="row g-0">
 					<div class="col-md-4">
 					<img class="article-img" src="{{ songs[i]['image_url'] }}" >
@@ -208,8 +239,12 @@
 
 				</div>
 			</div>
-		{% endfor %}
+			{%endfor%}
+
+
+		
 	</div>
+	{% endif %}
 	
 
 
@@ -227,37 +262,6 @@ function addSpinner() {
 }
 
 $( document ).ready(function() {
-	
-	$(".page-link").on("click", function() {
-		// disactivate the previous page and activate the clicked page
-		let previous_page_number = $("li.active").text(),
-			clicked_page_number  = $(this).text()
-		$("li.active").removeClass("active")		
-		$("#page_" + clicked_page_number).addClass("active")
-
-		toggle_songs(previous_page_number, clicked_page_number)
-		
-	});
-
-	// toggle songs that are displayed
-	function toggle_songs(previous_page_number, clicked_page_number) {
-		let num_songs_per_page = $("#songs_per_page").text()
-		$('#song_box_-'+previous_page_number.toString()).attr('id', 'song_box_-'+clicked_page_number.toString())
-		
-		// hide songs that were previously shown
-		for (let i=(previous_page_number-1) * num_songs_per_page; i<previous_page_number * num_songs_per_page; i++) {
-			$("#song_box_" + (i)).attr("hidden", true)
-			$("#nav_" + (i)).attr("hidden", true)
-		}
-
-		// show songs based on page that was clicked
-		for (let i=(clicked_page_number-1) * num_songs_per_page; i<clicked_page_number * num_songs_per_page; i++) {
-			$("#song_box_" + (i)).attr("hidden", false)
-			$("#nav_" + (i)).attr("hidden", false)
-		}
-
-
-	}
 
 	$("#toYear").focusout(function() {
 		validate_year_range()

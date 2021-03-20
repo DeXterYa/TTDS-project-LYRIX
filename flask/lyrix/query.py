@@ -10,7 +10,7 @@ from unidecode import unidecode
 #   top_k        - number of songs that you want to output.
 # Output:
 #   songs - list of top_k song objects most relevant to the query.
-def ranked_search(query, preprocessor, songs_col, index_col, artist_col, top_k, is_advanced, advaned_dict, lang='en'):
+def ranked_search(query, preprocessor, songs_col, index_col, artist_col, is_advanced, advaned_dict, lang='en'):
 
     # Remove nonenglish characters.
     query = unidecode(query)
@@ -45,19 +45,19 @@ def ranked_search(query, preprocessor, songs_col, index_col, artist_col, top_k, 
     idx     = list(np.argsort(list(scores.values())))[::-1]
     songs   = []
     relevance = []
-    total_count = len(idx)
+    
 
 
     if (not is_advanced):
         # if there is no advanced search content
-        results = list(np.array(list(scores.keys()))[idx])[:top_k]
+        results = list(np.array(list(scores.keys()))[idx])
         
-        for song_id in results:
+        # for song_id in results:
 
             # Query the songs collection in mongodb to load the actual song.
-            for song in songs_col.find({'_id': int(song_id)}):
-                songs += [song]
-                relevance += ["{:.2f}".format(scores[song_id])]
+            # for song in songs_col.find({'_id': int(song_id)}):
+            #     songs += [song]
+            #     relevance += ["{:.2f}".format(scores[song_id])]
     else:
         # if there is advanced search content
         # we keep all results first
@@ -79,6 +79,8 @@ def ranked_search(query, preprocessor, songs_col, index_col, artist_col, top_k, 
         startdate = advaned_dict["startdate"]
         enddate = advaned_dict["enddate"]
 
+        new_results = []
+
         for song_id in results:        
             for song in songs_col.find({'_id': int(song_id)}):
 
@@ -93,15 +95,18 @@ def ranked_search(query, preprocessor, songs_col, index_col, artist_col, top_k, 
 
                         if enddate and (int(enddate) < int(release_year.rpartition(' ')[-1])):
                             continue
+
+
+
                     
 
-                
-                songs += [song]
-                relevance += ["{:.2f}".format(scores[song_id])]
+                new_results += [song_id]
+            #     songs += [song]
+            #     relevance += ["{:.2f}".format(scores[song_id])]
 
-            if len(songs) >= top_k:
-                break
-
+            # if len(songs) >= top_k:
+            #     break
+        results = new_results
 
     
-    return songs, relevance, total_count
+    return results, scores, len(results)

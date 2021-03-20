@@ -20,7 +20,6 @@ index_collection = database["song_index"]
 artist_collection = database["artist_index"]
 preprocessor = Preprocessor()
 
-is_search = False
 
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="e03291f52cfb40c284711b9e6459b14d",
