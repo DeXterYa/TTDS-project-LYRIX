@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request
-from lyrix import app, sp, preprocessor, songs_collection, index_collection, session, artist_collection
+from lyrix import app, sp, preprocessor, songs_collection, index_collection, date_collection, session, artist_collection
 from lyrix.query import ranked_search
 from lyrix.forms import SearchBox
 import flask
@@ -38,7 +38,7 @@ def home():
 	is_advanced = False
 	advanced_dict = {}
 
-	if (singer or startdate or enddate):
+	if (bool(singer) or bool(startdate) or bool(enddate)):
 		# advanced search mode
 		is_advanced = True
 		advanced_dict = {"singer": singer, "startdate": startdate, "enddate":enddate}
@@ -58,7 +58,7 @@ def home():
 		form.language.default = language
 		form.process()
 		results, scores, num_songs_retrieved = ranked_search(lyrics, preprocessor, songs_collection,
-		  index_collection, artist_collection, is_advanced, advanced_dict, language)
+		  index_collection, artist_collection, date_collection, is_advanced, advanced_dict, language)
 		flask.session['results'] = results
 		flask.session['scores'] = scores
 
@@ -66,7 +66,7 @@ def home():
 		total_pages = math.ceil(num_songs_retrieved / songs_per_page)
 		page_num = 1
 
-		print(total_pages)
+
 		# generate page list
 		if total_pages >= displayed_page_links:
 			page_list = [x for x in range(1, displayed_page_links + 1)]

@@ -18,6 +18,7 @@ database         = client["lyrix"]
 songs_collection = database["songs"]
 index_collection = database["song_index"]
 artist_collection = database["artist_index"]
+date_collection  = database["date_index"]
 preprocessor = Preprocessor()
 
 

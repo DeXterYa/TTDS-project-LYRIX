@@ -10,7 +10,7 @@ from unidecode import unidecode
 #   top_k        - number of songs that you want to output.
 # Output:
 #   songs - list of top_k song objects most relevant to the query.
-def ranked_search(query, preprocessor, songs_col, index_col, artist_col, is_advanced, advaned_dict, lang='en'):
+def ranked_search(query, preprocessor, songs_col, index_col, artist_col, date_col, is_advanced, advaned_dict, lang='en'):
 
     # Remove nonenglish characters.
     query = unidecode(query)
@@ -49,64 +49,51 @@ def ranked_search(query, preprocessor, songs_col, index_col, artist_col, is_adva
 
 
     if (not is_advanced):
-        # if there is no advanced search content
+        
         results = list(np.array(list(scores.keys()))[idx])
         
-        # for song_id in results:
-
-            # Query the songs collection in mongodb to load the actual song.
-            # for song in songs_col.find({'_id': int(song_id)}):
-            #     songs += [song]
-            #     relevance += ["{:.2f}".format(scores[song_id])]
+       
     else:
-        # if there is advanced search content
-        # we keep all results first
-        results = list(np.array(list(scores.keys()))[idx])
-
+        
+        results = set(scores.keys())
+        
         singer = advaned_dict["singer"]
-
-        if singer is not None:
+        
+        if singer is not None and len(singer.strip())!=0:
             translator = str.maketrans(string.punctuation, ' '*len(string.punctuation))
             name_list = singer.lower().translate(translator).split()
             song_ids_with_artist = set()
             for record in artist_col.find({"_id": {"$in":name_list}}):
                 song_ids_with_artist = song_ids_with_artist.union(set(record['indexes']))
 
-            results = [result for result in results if result in song_ids_with_artist]
+            results = results.intersection(song_ids_with_artist)
 
 
         
         startdate = advaned_dict["startdate"]
         enddate = advaned_dict["enddate"]
+        
 
-        new_results = []
+        if bool(startdate) or bool(enddate): 
+            song_ids_with_date = []
+            if bool(startdate) and bool(enddate):
+                for record in date_col.find({"_id": {"$gt": int(startdate)-1, "$lt": int(enddate)+1}}):
+                    song_ids_with_date += list(record['indexes'])
+                results = results.intersection(set(song_ids_with_date))
 
-        for song_id in results:        
-            for song in songs_col.find({'_id': int(song_id)}):
+            elif bool(startdate):
+                for record in date_col.find({"_id": {"$gt": int(startdate)-1}}):
+                    song_ids_with_date += list(record['indexes'])
+                results = results.intersection(set(song_ids_with_date))
+                
+            elif bool(enddate):
+                for record in date_col.find({"_id": {"$lt": int(enddate)+1}}):
+                    song_ids_with_date += list(record['indexes'])
+                results = results.intersection(set(song_ids_with_date))
 
-                if startdate or enddate:
-                    # if the user specify the startdate or enddate
-                    release_year = song['credits'].get('Release Date', [[""]])[0][0]
-
-                    if release_year != "":
-                        # release year field is not empty
-                        if startdate and (int(startdate) > int(release_year.rpartition(' ')[-1])):
-                            continue
-
-                        if enddate and (int(enddate) < int(release_year.rpartition(' ')[-1])):
-                            continue
-
-
-
-                    
-
-                new_results += [song_id]
-            #     songs += [song]
-            #     relevance += ["{:.2f}".format(scores[song_id])]
-
-            # if len(songs) >= top_k:
-            #     break
-        results = new_results
+        results = sorted(list(results), key=lambda x: scores[x], reverse=True)
+        
+        
 
     
     return results, scores, len(results)
