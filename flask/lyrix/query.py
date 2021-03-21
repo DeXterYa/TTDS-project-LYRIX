@@ -62,11 +62,13 @@ def ranked_search(query, preprocessor, songs_col, index_col, artist_col, date_co
         if singer is not None and len(singer.strip())!=0:
             translator = str.maketrans(string.punctuation, ' '*len(string.punctuation))
             name_list = singer.lower().translate(translator).split()
-            song_ids_with_artist = set()
-            for record in artist_col.find({"_id": {"$in":name_list}}):
-                song_ids_with_artist = song_ids_with_artist.union(set(record['indexes']))
+            
 
-            results = results.intersection(song_ids_with_artist)
+            for record in artist_col.find({"_id": {"$in":name_list}}):
+                
+                results = results.intersection(set(record['indexes']))
+
+            
 
 
         
